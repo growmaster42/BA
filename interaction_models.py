@@ -156,7 +156,7 @@ def heisenberg_chain(vec, spin, number_of_spins):
                     s_m_s_p += 0
                 # appending all the values to matrix (array) pre-factor 0.25 derives from unity matrix
                 # transformation and the pre-factors when transforming sx and sy to s_plus and s_minus
-                matrix[k, l] = - 2 * (sz_sz + 0.5 * (s_p_s_m + s_m_s_p))
+                matrix[k, l] = - 2 * J_ij * (sz_sz + 0.5 * (s_p_s_m + s_m_s_p))
     return matrix
 
 

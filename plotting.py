@@ -1,42 +1,51 @@
 import matplotlib.pyplot as plt
 from expectation_values import all_exp_values
 from pathlib import Path
-def plot_degeneracy():
-    # Data dictionaries
-    spin_one_half = {(0.5, 2): 2, (0.5, 3): 2, (0.5, 5): 2, (0.5, 7): 2}
-    spin_one = {(1, 2): 2}
-    spin_one_half = {(1.5, 2): 2, (1.5, 3): 2, (1.5, 5): 2}
-    spin_two = {(2, 2): 2}
-    spin_two_half = {(2.5, 2): 2, (2.5, 3): 2}
+import matplotlib.pyplot as plt
+from intial_values import J_ij
 
-    # Extracting points for plotting
-    x1, y1 = zip(*[(x[1], y) for x, y in spin_one_half.items()])
-    x2, y2 = zip(*[(x[1], y) for x, y in spin_one.items()])
-    x3, y3 = zip(*[(x[1], y) for x, y in spin_one_half.items()])
-    x4, y4 = zip(*[(x[1], y) for x, y in spin_two.items()])
-    x5, y5 = zip(*[(x[1], y) for x, y in spin_two_half.items()])
+def degeneracy_plot():
+    # Define the data within the function
+    data = {0.5 : {2: 1, 3: 2, 4: 1, 5: 2, 6: 1, 7: 2, 8: 1, 9: 2},
+            1 : {2: 1, 3: 1, 4: 1, 5: 1},
+            1.5: {2: 1, 3: 2, 4: 1, 5: 2},
+            2: {},
+            2.5 : {}}
 
-    # Plotting
-    plt.figure(figsize=(10, 6))
-    plt.scatter(x1, y1, color='red', label='Spin 0.5', marker='o')
-    plt.scatter(x2, y2, s= 200,  color='blue', label='Spin 1', marker='x')
-    plt.scatter(x3, y3, color='green', label='Spin 1.5', marker='*')
-    plt.scatter(x4, y4, color='purple', label='Spin 2', marker='+')
-    plt.scatter(x5, y5, color='orange', label='Spin 2.5', marker='.')
+    # Create figure and axis
+    fig, ax = plt.subplots()
 
-    plt.xlabel('Number of Spins')
-    plt.ylabel('Integer Value')
+    # Extract x and y values from the dictionary
+    x_values = list(data[0.5].keys())
+    y_values = list(data[0.5].values())
+
+    # Create the scatter plot
+    plt.scatter(x_values, y_values, color='blue')
+
+    # Set the x-axis range from 2 to 10
+    plt.xlim(1, 10)
+
+    # Set the y-axis range from 0 to 3
     plt.ylim(0, 3)
-    plt.xlim(0, 8)
-    plt.legend()
-    plt.title('Spin Values in XY-Plane')
+
+    # Add grid for better readability
+    plt.grid(True, linestyle='--', alpha=0.7)
+
+    # Add labels and title
+    plt.xlabel('Number of Spins')
+    plt.ylabel('Degree of Degeneracy')
+    plt.title(f'Degeneracy Plot for J_ij = {J_ij}')
+
+    # Show the plot
     plt.show()
 
-#plot_degeneracy()
+
+# Example usage:
 
 
 
-import matplotlib.pyplot as plt
+
+
 
 def plot_dict(data, spin, num_spins, dg_deg):
     output_dir = Path("data/plots")
@@ -69,11 +78,8 @@ def plot_dict(data, spin, num_spins, dg_deg):
 
 def save_all_plots(spin, max_spins):
     for num_spins in range(2, max_spins + 1):
-        dg_deg = 1
+        dg_deg = 0
         plot_dict(all_exp_values(spin, num_spins, dg_deg), spin, num_spins, dg_deg)
 
 
-spin = 1
-num_spins = 2
-dg_deg = 0
-plot_dict(all_exp_values(spin, num_spins, dg_deg), spin, num_spins, dg_deg)
+
