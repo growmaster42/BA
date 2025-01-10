@@ -96,8 +96,7 @@ def all_exp_values(spin, max_spins, dg_deg):
     return values
 
 
-import numpy as np
-from scipy.sparse import kron, identity
+
 
 
 
