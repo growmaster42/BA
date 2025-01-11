@@ -4,26 +4,33 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 from intial_values import J_ij
 
-def degeneracy_plot():
+import matplotlib.pyplot as plt
+
+def degeneracy_plot(spin_system):
     # Define the data within the function
-    data = {0.5 : {2: 1, 3: 2, 4: 1, 5: 2, 6: 1, 7: 2, 8: 1, 9: 2},
+    data = {0.5 : {2: 1, 3: 2, 4: 1, 5: 2, 6: 1, 7: 2, 8: 1, 9: 2, 10: 1},
             1 : {2: 1, 3: 1, 4: 1, 5: 1},
             1.5: {2: 1, 3: 2, 4: 1, 5: 2},
-            2: {},
-            2.5 : {}}
+            2: {2: 1, 3: 2, 4: 1, 5: 1},
+            2.5 : {2: 1, 3: 2, 4: 1}}
+
+    # Check if the input spin system exists in the data
+    if spin_system not in data:
+        print(f"Spin system {spin_system} not found in the data.")
+        return
 
     # Create figure and axis
     fig, ax = plt.subplots()
 
     # Extract x and y values from the dictionary
-    x_values = list(data[0.5].keys())
-    y_values = list(data[0.5].values())
+    x_values = list(data[spin_system].keys())
+    y_values = list(data[spin_system].values())
 
     # Create the scatter plot
     plt.scatter(x_values, y_values, color='blue')
 
     # Set the x-axis range from 2 to 10
-    plt.xlim(1, 10)
+    plt.xlim(1, 11)
 
     # Set the y-axis range from 0 to 3
     plt.ylim(0, 3)
@@ -34,13 +41,12 @@ def degeneracy_plot():
     # Add labels and title
     plt.xlabel('Number of Spins')
     plt.ylabel('Degree of Degeneracy')
-    plt.title(f'Degeneracy Plot for J_ij = {J_ij}')
+    plt.title(f'Degeneracy Plot for Spin System {spin_system}')
 
     # Show the plot
     plt.show()
 
 
-# Example usage:
 
 
 

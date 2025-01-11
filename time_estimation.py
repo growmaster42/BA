@@ -6,13 +6,24 @@ from scipy.optimize import curve_fit
 # Dictionary to store data for different spin systems
 spin_systems_data = {
     0.5: {
-        "n_values": np.array([2, 3, 4, 5, 6, 7, 8, 9]),
-        "times": np.array([0.005464076995849609, 0.010461091995239258, 0.06242799758911133, 0.30720996856689453, 1.8171741962432861, 10.644792795181274, 60.47462773323059, 338.1103768348694])
+        "n_values": np.array([2, 3, 4, 5, 6, 7, 8, 9, 10]),
+        "times": np.array([0.005464076995849609, 0.010461091995239258, 0.06242799758911133, 0.30720996856689453, 1.8171741962432861, 10.644792795181274, 60.47462773323059, 338.1103768348694, 1726.8112230300903])
     },
+    1: {
+            "n_values": np.array([2, 3, 4]),
+            "times": np.array([0.002875089645385742, 0.04745030403137207, 0.6411268711090088])  # Example data for spin 1
+        },
+    1.5: {
+                "n_values": np.array([2, 3, 4]),
+                "times": np.array([0.02449178695678711, 0.43862295150756836, 12.855217933654785])  # Example data for spin 1
+        },
+    2.0 : { "n_values": np.array([2, 3, 4, 5]),
+                "times": np.array([0.02277088165283203, 0.9565587043762207, 42.07624816894531, 1682.0156149864197])},
     2.5: {
         "n_values": np.array([2, 3, 4]),
-        "times": np.array([0.05979585647583008, 1.331153154373169, 70.13526701927185])  # Example data for spin 1
-    }
+        "times": np.array([0.07218098640441895, 4.7457239627838135, 358.77376198768616])  # Example data for spin 1
+    },
+
     # Add more spin systems as needed
 }
 
@@ -57,7 +68,7 @@ def estimate_time(spin, num_spins):
     plt.ylabel("Computation Time (s)")
     plt.yscale("log")
     plt.legend()
-    plt.show()
+
 
     return estimated_time
 

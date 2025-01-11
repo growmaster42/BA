@@ -11,13 +11,16 @@ from saving_data import *
 from expectation_values import *
 from distance_calculations import *
 
-spin = 1.5
-num_spins = 5
-eigenvalue = np.linalg.eigvalsh(spin_ring_hamiltonian(spin, num_spins))
-print(f"Eigenvalues of the Hamiltonian for {num_spins} spins with spin {spin}: \n", eigenvalue)
-
-#degeneracy_plot()
-#print((1/0.19245) * s_j_s_heis(basvec(0.5, 3), 0.5, 3))
+store_systems(spin_ring_hamiltonian, 2, 10, 0.5)
+print("done")
+store_systems(spin_ring_hamiltonian, 2, 7, 1)
+print("done")
+store_systems(spin_ring_hamiltonian, 2, 5, 1.5)
+print("done")
+store_systems(spin_ring_hamiltonian, 2, 5, 2)
+print("done")
+store_systems(spin_ring_hamiltonian, 2, 4, 2.5)
+print("done")
 
 
 
