@@ -10,18 +10,11 @@ from misc import *
 from saving_data import *
 from expectation_values import *
 from distance_calculations import *
-
-store_systems(spin_ring_hamiltonian, 2, 10, 0.5)
-print("done")
-store_systems(spin_ring_hamiltonian, 2, 7, 1)
-print("done")
-store_systems(spin_ring_hamiltonian, 2, 5, 1.5)
-print("done")
-store_systems(spin_ring_hamiltonian, 2, 5, 2)
-print("done")
-store_systems(spin_ring_hamiltonian, 2, 4, 2.5)
-print("done")
-
+spin = 0.5
+num_spins = 10
+hamiltonian = spin_ring_hamiltonian(spin, num_spins)
+eigenvalue, eigenvector = np.linalg.eigh(hamiltonian)
+print(eigenvalue[:2])
 
 
 

@@ -69,32 +69,13 @@ def store_systems(hamiltonian, min_spin, max_spin, spin):
         print("Data has been stored successfully!!!!!")
 
 
-def load_spin_system(spin, num_spins):
-    directory = 'data/ground_state_vectors'
+def load_spin_system(spin, num_spins, directory):
     file_name = "spin=" + str(spin) + "_num_spins=" + str(num_spins)
     spin_system = load_dict(file_name, directory)
     return spin_system
 
 
-def calculate_eigenvalues(matrix):
-    """
-    Berechnet die Eigenwerte einer symmetrischen Matrix und speichert sie in einer Textdatei.
 
-    Args:
-        matrix: Eine symmetrische numpy-Array Matrix
-    """
-    # Überprüfe ob Matrix symmetrisch ist
-    if not np.allclose(matrix, matrix.T):
-        raise ValueError("Die eingegebene Matrix ist nicht symmetrisch!")
-
-    # Berechne Eigenwerte
-    eigenvalues = np.linalg.eigvalsh(matrix)
-
-    # Speichere Eigenwerte in Textdatei
-    with open('eigenvalues.txt', 'w') as f:
-        f.write("Eigenwerte der Matrix:\n")
-        for value in eigenvalues:
-            f.write(f"{value}\n")
 
 
 
