@@ -14,7 +14,9 @@ def degeneracy_plot(spin_system, coupling_constant):
                   (1, -1) : {2: 1, 3: 1, 4: 1, 5: 1},
                   (1.5, -1): {2: 1, 3: 2, 4: 1, 5: 2},
                   (2, -1): {2: 1, 3: 1, 4: 1, 5: 1},
-                  (2.5, -1) : {2: 1, 3: 2, 4: 1}}
+                  (2.5, -1) : {2: 1, 3: 2, 4: 1},
+                  (0.5, 0) : {2: 2, 3: 2, 4: 1, 5: 2, 6: 1, 7: 2, 8: 2, 9: 2, 10: 1},
+                  (1, 0) : {3: 1, 4: 1, 5: 1, 6: 1, 7:1}}
 
     # Check if the input spin system exists in the data_jij_m
     if (spin_system, coupling_constant) not in data_jij_m:
@@ -56,6 +58,8 @@ def degeneracy_plot(spin_system, coupling_constant):
         j_formatted = r"$J_{ij} = -1$"
     elif coupling_constant == 1:
         j_formatted = r"$J_{ij} = 1$"
+    elif coupling_constant == 0:
+        j_formatted = r"$J_{ij} = 0$"
     else:
         raise ValueError("Invalid coupling constant")
     # Add labels and title

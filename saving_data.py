@@ -1,7 +1,12 @@
-import numpy as np
 import os
 import math
 import pickle
+from pathlib import Path
+from datetime import datetime
+import json
+import os
+from collections import Counter
+import numpy as np
 
 # Write a vector to a text file
 def write_vector_to_txt(vector, directory, filename):
@@ -75,10 +80,6 @@ def load_spin_system(spin, num_spins, directory):
     return spin_system
 
 
-import numpy as np
-import json
-from pathlib import Path
-from datetime import datetime
 
 
 def calculate_degeneracy(eigenvalues, tolerance=1e-10):
@@ -122,7 +123,7 @@ def process_and_store_eigenvalues(matrix, spin, num_spins, j_ij):
     data_dir.mkdir(parents=True, exist_ok=True)
 
     # Create filename based on parameters
-    filename = f"spin={spin}_num_spins={num_spins}_J_ij={j_ij}.json"
+    filename = f"dipole_spin={spin}_num_spins={num_spins}_J_ij={j_ij}.json"
     filepath = data_dir / filename
 
     # Calculate eigenvalues and sort them
@@ -170,6 +171,87 @@ def process_and_store_eigenvalues(matrix, spin, num_spins, j_ij):
               "\n Eigenvalues for spin system with", num_spins,
               "spins have been calculated and stored. \n "
               "-----------------------------------------------------------")
+
+
+def generate_latex_table(json_file, output_dir='data/tables'):
+    """
+    Generate a LaTeX table from JSON data and save it to a text file.
+    States are numbered sequentially, with identical eigenvalues sharing the same state number.
+
+    Args:
+        json_file (str): Path to the JSON file
+        output_dir (str): Directory where the LaTeX table will be saved
+    """
+    # Create output directory if it doesn't exist
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Read JSON file
+    with open(json_file, 'r') as f:
+        data = json.load(f)
+
+    # Process the non-metadata entry (assuming only one such entry exists)
+    key = next(k for k in data.keys() if k != "metadata")
+    values = data[key]
+
+    # Parse the key string (removing parentheses and splitting by comma)
+    key_values = [float(x.strip()) for x in key.strip('()').split(',')]
+    spin, num_spins, j_ij = key_values[0], key_values[1], key_values[2]
+
+    # Round values for comparison
+    rounded_values = np.round(values, decimals=7)
+
+    # Create state numbering
+    # First, get unique values while preserving order
+    unique_values = []
+    seen = set()
+    for val in rounded_values:
+        if val not in seen:
+            unique_values.append(val)
+            seen.add(val)
+
+    # Create value to state mapping
+    value_to_state = {val: idx + 1 for idx, val in enumerate(unique_values)}
+
+    # Count degeneracies
+    degeneracy = Counter(rounded_values)
+
+    # Generate LaTeX table content
+    latex_content = [
+        "\\begin{table}[htbp]",
+        "\\centering",
+        "\\begin{tabular}{|c|c|c|}",
+        "\\hline",
+        "State & Eigenvalue & Degree of Degeneracy \\\\",
+        "\\hline",
+    ]
+
+    # Add data rows, now with properly numbered states
+    for value in values:
+        rounded_val = np.round(value, decimals=7)
+        state_num = value_to_state[rounded_val]
+        latex_content.append(
+            f"{state_num} & {value:.9f} & {degeneracy[rounded_val]} \\\\"
+        )
+
+    # Complete the table
+    latex_content.extend([
+        "\\hline",
+        "\\end{tabular}",
+        f"\\caption{{spin = {spin}, num\\_spins = {int(num_spins)} and J\\_{{ij}} = {j_ij}}}",
+        "\\end{table}"
+    ])
+
+    # Save to file
+    output_filename = f"table_spin{spin}_numspins{int(num_spins)}_jij{j_ij}.txt"
+    output_path = os.path.join(output_dir, output_filename)
+
+    with open(output_path, 'w') as f:
+        f.write('\n'.join(latex_content))
+
+    print(f"LaTeX table has been saved to: {output_path}")
+
+# Example usage:
+# generate_latex_table('path_to_your_json_file.json')
 
 
 
