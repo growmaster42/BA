@@ -14,8 +14,8 @@ from distance_calculations import *
 import multiprocessing as mp
 import logging
 from functools import partial
-
-s
+matrix = dipole_dipole(basvec(0.5, 8), 0.5, 8)
+process_and_store_eigenvalues(matrix, 0.5, 8, 0)
 
 
 

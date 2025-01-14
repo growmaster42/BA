@@ -127,7 +127,7 @@ def process_and_store_eigenvalues(matrix, spin, num_spins, j_ij):
     filepath = data_dir / filename
 
     # Calculate eigenvalues and sort them
-    eigenvalues = np.sort(np.linalg.eigvals(matrix).real)
+    eigenvalues = np.linalg.eigvals(matrix)
 
     # Calculate ground state degeneracy
     dg_deg_ground = calculate_degeneracy(eigenvalues)
