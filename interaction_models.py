@@ -1,11 +1,6 @@
 from operators import *
 from distance_calculations import *
 from basis_vectors import basvec
-from misc import scalarproduct
-from basis_vectors import vector_number
-from saving_data import read_vector_from_txt
-from data import *
-
 
 
 # function that calculates matrix entries for the heisenberg-alike part in the dipole-dipole interaction term
@@ -114,13 +109,14 @@ def s_j_s_nhdw(vec, spin, number_of_spins):
 
 
 # function that calls both dipole-dipole terms and adds them up correctly
-def dipole_dipole(vec, spin, number_of_spins):
+def dipole_dipole(spin, number_of_spins):
+    vec = basvec(spin, number_of_spins)
     matrix = prefactor_sum_dd * (s_j_s_heis(vec, spin, number_of_spins) - 3 * s_j_s_nhdw(vec, spin, number_of_spins))
     return matrix
 
 
 # function that calculates matrix elements for heisenberg_hamiltonian spin-chain
-def heisenberg_chain(vec, spin, number_of_spins):
+def heisenberg_chain(vec, spin, number_of_spins, j_ij):
     number_of_states = int(2 * spin + 1)
     dim = number_of_states ** number_of_spins
     num_spins = number_of_spins
@@ -156,18 +152,18 @@ def heisenberg_chain(vec, spin, number_of_spins):
                     s_m_s_p += 0
                 # appending all the values to matrix (array) pre-factor 0.25 derives from unity matrix
                 # transformation and the pre-factors when transforming sx and sy to s_plus and s_minus
-                matrix[k, l] = - 2 * J_ij * (sz_sz + 0.5 * (s_p_s_m + s_m_s_p))
+                matrix[k, l] = - 2 * j_ij * (sz_sz + 0.5 * (s_p_s_m + s_m_s_p))
     return matrix
 
 
 # function that calculates heisenberg_spin_ring hamilton matrix entries
-def heisenberg_ring(vec, spin, number_of_spins):
+def heisenberg_ring(vec, spin, number_of_spins, j_ij):
     number_of_states = int(2 * spin + 1)
     dim = number_of_states ** number_of_spins
     num_spins = number_of_spins
     if num_spins == 2:
         print("Spin-Chain used instead")
-        heisenberg_chain(vec, spin, number_of_spins)
+        heisenberg_chain(vec, spin, number_of_spins, j_ij)
     matrix = np.zeros((dim, dim), dtype=complex)
     basis_vectors = vec.copy()
     for k, ket in enumerate(basis_vectors):
@@ -200,7 +196,7 @@ def heisenberg_ring(vec, spin, number_of_spins):
                     s_m_s_p += 0
                 # appending all the values to matrix (array) pre-factor 0.25 derives from unity matrix
                 # transformation and the pre-factors when transforming sx and sy to s_plus and s_minus
-                matrix[k, l] = - 2 * J_ij * (sz_sz + 0.5 * (s_p_s_m + s_m_s_p))
+                matrix[k, l] = - 2 * j_ij * (sz_sz + 0.5 * (s_p_s_m + s_m_s_p))
 
     return matrix
 
@@ -229,33 +225,13 @@ def zeeman(vec, spin, number_of_spins, b_field):
     return matrix
 
 
-def spin_ring_hamiltonian(s, n):
+def spin_ring(s, n, j_ij):
     vec = basvec(s, n)
-    spin_ring_matrix = heisenberg_ring(vec, s, n) + dipole_dipole(vec, s, n)
+    if j_ij == 0:
+        spin_ring_matrix = dipole_dipole(s, n)
+    else:
+        spin_ring_matrix = heisenberg_ring(vec, s, n, j_ij) + dipole_dipole(s, n)
     return spin_ring_matrix
-
-
-# function that combines the heisenberg and dipole-dipole interaction to a full spin ring and returns its eigenvalues
-def spin_ring_eigenvalues(s, n):
-    spin_ring_matrix = spin_ring_hamiltonian(s, n)
-    eigenvalues = np.linalg.eigvalsh(spin_ring_matrix)
-    return eigenvalues
-
-
-# heisenberg-ring + zeeman term matrix
-def lukas_ring(s, n, b_field):
-    vec = basvec(s, n)
-    spin_ring_matrix = heisenberg_ring(vec, s, n) + zeeman(vec, s, n, b_field)
-    return spin_ring_matrix
-
-
-# function which returns real eigenvectors
-def eigenvectors(interaction_model):
-    spin_ring_matrix = interaction_model
-    eigenvalues, eigenvecs = np.linalg.eigh(spin_ring_matrix)
-    return np.real(eigenvecs)
-
-
 
 
 def spin_pair_operator(spin, spin_pair, number_of_spins):

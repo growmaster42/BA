@@ -1,7 +1,4 @@
-import numpy as np
-import math
-from saving_data import *
-import json
+from Masochismus.old_versions.saving_data import *
 
 
 def scalarproduct(ket1, ket2):  # norm. Skalarprodukt, vergleicht nur ob zwei Kets gleich sind oder nicht und gibt

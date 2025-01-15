@@ -1,8 +1,7 @@
 import multiprocessing as mp
 import logging
-from functools import partial
 from interaction_models import spin_ring_hamiltonian
-from saving_data import store_systems
+from Masochismus.old_versions.saving_data import store_systems
 
 def parallel_store_systems(max_processes=None):
     # Define the parameters for each core
