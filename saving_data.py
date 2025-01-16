@@ -1,4 +1,4 @@
-
+import multiprocessing as mp
 from numpy import linalg as lg
 from interaction_models import *
 from numpy import isclose
@@ -82,9 +82,6 @@ def save_5(min, max):
     print("OOOOOOOOOOOOOOspin fully 2.5 doneOOOOOOOOOOOOOO")
 
 
-import multiprocessing as mp
-
-
 def run_parallel_saves_explicit(min_value):
     # Create process objects
     processes = [
@@ -103,8 +100,33 @@ def run_parallel_saves_explicit(min_value):
     for p in processes:
         p.join()
 
+def state_degeneracy(spin, num_spins, j_ij, state):
+    spin_system = load_system(spin, num_spins, j_ij)
+    degeneracies = spin_system['degeneracies']
+    if state >= len(degeneracies):
+        return ValueError("State not in system")
+    else:
+        return degeneracies[state]
 
-# Usage
-if __name__ == '__main__':
-    min_value = 2  # Replace with your actual min value
-    run_parallel_saves_explicit(min_value)
+def collect_degeneracies(spin, j_ij, state):
+    key_1 = (spin, j_ij)
+    all_degeneracies = {key_1: {}}
+    if spin == 0.5:
+        num_spins = 10
+    elif spin == 1:
+        num_spins = 7
+    elif spin == 1.5:
+        num_spins = 5
+    elif spin == 2:
+        num_spins = 5
+    elif spin == 2.5:
+        num_spins = 4
+    for n in range(2, num_spins + 1):
+        key_2 = n
+        degeneracy = state_degeneracy(spin, n, j_ij, state)
+        all_degeneracies[key_1][key_2] = degeneracy
+    return all_degeneracies
+
+
+
+

@@ -1,79 +1,54 @@
 import os
 from expectation_values import all_exp_values
 from pathlib import Path
-
-from intial_values import J_ij
-
+from saving_data import collect_degeneracies
 import matplotlib.pyplot as plt
 plt.rcParams['text.usetex'] = True
 
 
-def degeneracy_plot(spin_system, coupling_constant):
+def degeneracy_plot(spin, j_ij, state):
     # Define the data_jij_m within the function, the data_jij_m refers to the coupling constant J_ij which is set to -1
-    data_jij_m = {(0.5, -1) : {2: 1, 3: 2, 4: 1, 5: 2, 6: 1, 7: 2, 8: 1, 9: 2, 10: 1},
-                  (1, -1) : {2: 1, 3: 1, 4: 1, 5: 1},
-                  (1.5, -1): {2: 1, 3: 2, 4: 1, 5: 2},
-                  (2, -1): {2: 1, 3: 1, 4: 1, 5: 1},
-                  (2.5, -1) : {2: 1, 3: 2, 4: 1},
-                  (0.5, 0) : {2: 2, 3: 2, 4: 1, 5: 2, 6: 1, 7: 2, 8: 2, 9: 2, 10: 1},
-                  (1, 0) : {3: 1, 4: 1, 5: 1, 6: 1, 7:1}}
-
-    # Check if the input spin system exists in the data_jij_m
-    if (spin_system, coupling_constant) not in data_jij_m:
-        print(f"Spin system {spin_system} not found in the data_jij_m.")
-        return
-
+    data = collect_degeneracies(spin, j_ij, state)
     # Create figure and axis
     fig, ax = plt.subplots()
 
     # Extract x and y values from the dictionary
-    x_values = list(data_jij_m[(spin_system, coupling_constant)].keys())
-    y_values = list(data_jij_m[(spin_system, coupling_constant)].values())
+    x_values = list(data[(spin, j_ij)].keys())
+    y_values = list(data[(spin, j_ij)].values())
 
     # Create the scatter plot
     plt.scatter(x_values, y_values, color='blue')
 
     # Set the x-axis range from 2 to 10
-    plt.xlim(1, max(data_jij_m[(spin_system, coupling_constant)].keys()) + 1)
+    plt.xlim(1, max(data[(spin, j_ij)].keys()) + 1)
 
     # Set the y-axis range from 0 to 3
     plt.ylim(0, 3)
 
     # Add grid for better readability
     plt.grid(True, linestyle='--', alpha=0.7)
-    if spin_system == 0.5:
-        s_system = r"$s =\frac{1}{2}$"
-        plt.xticks(range(2, max(data_jij_m[(spin_system, coupling_constant)].keys()) + 1))
-    elif spin_system == 1:
-        s_system = r"$s =1$"
-    elif spin_system == 1.5:
-        s_system = r"$s =\frac{3}{2}$"
-    elif spin_system == 2:
-        s_system = r"$s =2$"
-    elif spin_system == 2.5:
-        s_system = r"$s =\frac{5}{2}$"
-    else:
-        raise ValueError("Invalid spin system")
-    if coupling_constant == -1:
-        j_formatted = r"$J_{ij} = -1$"
-    elif coupling_constant == 1:
-        j_formatted = r"$J_{ij} = 1$"
-    elif coupling_constant == 0:
-        j_formatted = r"$J_{ij} = 0$"
-    else:
-        raise ValueError("Invalid coupling constant")
+
+    state_name = r"Ground State" if state == 0 else  str(state) + r". Excited State"
     # Add labels and title
     plt.xlabel('Number of Spins')
     plt.ylabel('Degree of Degeneracy')
-    plt.title(r"Degree of Degeneracy for " + s_system + r" and " + j_formatted)
-
+    if spin == 0.5:
+        plt.title(state_name + r" Degeneracy for $s=\frac{1}{2}$ and $J_{ij}=$" + f"{j_ij}")
+    elif spin == 1:
+        plt.title(state_name + r" Degeneracy for $s=1$ and $J_ij=$" + f"{j_ij}")
+    elif spin == 1.5:
+        plt.title(state_name + r" Degeneracy for $s=\frac{3}{2}$ and $J_{ij}=$" + f"{j_ij}")
+    elif spin == 2:
+        plt.title(state_name + r" Degeneracy for $s=2$ and $J_{ij}=$" + f"{j_ij}")
+    elif spin == 2.5:
+        plt.title(state_name +r" Degeneracy for $s=\frac{5}{2}$ and $J_{ij}=$" + f"{j_ij}")
     # make os.makedirs to create the directory if it doesn't exist
     os.makedirs('data/plots', exist_ok=True)
 
     # Save the plot
-    plt.savefig(f"data/plots/degeneracy_for_s={spin_system}_and_j_ij={coupling_constant}.pdf", format="pdf")
+    plt.savefig(f"data/plots/degeneracy_for_s={spin}_and_j_ij={j_ij}.pdf", format="pdf")
     # Show the plot
-    plt.show()
+    #plt.show()
 
 
 
