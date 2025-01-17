@@ -5,9 +5,3 @@ from concurrent.futures import ProcessPoolExecutor
 import time
 from plotting import degeneracy_plot
 
-for i in range(-1, 2):
-    degeneracy_plot(0.5, i, 0)
-    degeneracy_plot(1, i, 0)
-    degeneracy_plot(1.5, i, 0)
-    degeneracy_plot(2, i, 0)
-    degeneracy_plot(2.5, i, 0)

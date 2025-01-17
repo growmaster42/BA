@@ -3,24 +3,37 @@ from distance_calculations import *
 from basis_vectors import basvec
 
 
-# function that calculates matrix entries for the heisenberg-alike part in the dipole-dipole interaction term
+
 def s_j_s_heis(vec, spin, number_of_spins):
+    """This function calculates the Heisenberg part of the dipole-dipole interaction,
+    containing s_z * s_z, s+ * s- and s- * s+ for each pair of spins"""
     number_of_states = int(2 * spin + 1)
     dim = number_of_states ** number_of_spins
     num_spins = number_of_spins
     matrix = np.zeros((dim, dim), dtype=complex)
     basis_vectors = vec.copy()
     b_ij_factor = b_ij(num_spins)
+    # creating the orientation matrices for each pair of spins which apparently is
+    # a unity matrix, but this is done to make the code more readable and to transform
+    # the matrix elements to the correct basis
     j_xx = 1
     j_xy = 0
     j_yx = 0
     j_yy = 1
     j_zz = 1
+    # with k we iterate over all basis vectors; in this case they refer
+    # to the row of the matrix
     for k, ket in enumerate(basis_vectors):
+        # with l we iterate over all basis vectors; in this case they refer
+        # to the column of the matrix
         for l, bra in enumerate(basis_vectors):
+            # initializing the matrix elements to zero
             sz_sz = 0
             s_p_s_m = 0
             s_m_s_p = 0
+            # iterating over all spins - 1, in order to avoid index errors since
+            # the last spin is actually covered by the index j that starts at i + 1
+            # the iteration over j returns all possible pairs of spins
             for i in range(num_spins - 1):
                 for j in range(i + 1, num_spins):
                     if np.array_equal(ket, bra):
@@ -50,8 +63,10 @@ def s_j_s_heis(vec, spin, number_of_spins):
     return matrix
 
 
-# function that calculates the non-heisenberg part of the dipole-dipole interaction, containing s++, s+-, s-+, s--
+
 def s_j_s_nhdw(vec, spin, number_of_spins):
+    """This function calculates the non-Heisenberg part of the
+    dipole-dipole interaction, containing s++, s+-, s-+, s--"""
     number_of_states = int(2 * spin + 1)
     num_spins = number_of_spins
     dim = number_of_states ** number_of_spins
@@ -110,6 +125,17 @@ def s_j_s_nhdw(vec, spin, number_of_spins):
 
 # function that calls both dipole-dipole terms and adds them up correctly
 def dipole_dipole(spin, number_of_spins):
+    """This function calculates the dipole-dipole interaction:
+
+    H_dd = mu_0*(g*mu_b)**2/(4*pi*1e-10) *
+    SUM_i<j 1/(r_ij 4*pi*1e-10) * (s_i * s_j
+    - 3(s_i * e_i * e_j * s_j))
+
+    where e_i is the 3-D unit vector of the i-th spin
+    and e_j is the 3-D unit vector of the j-th spin; the dyadic product of
+    e_i and e_j, here depicted with an asterisk, is a 3x3 matrix with coupling
+    constants for each pair of spins that depend on the
+    distance between the spins and the orientation of the spins. """
     vec = basvec(spin, number_of_spins)
     matrix = prefactor_sum_dd * (s_j_s_heis(vec, spin, number_of_spins) - 3 * s_j_s_nhdw(vec, spin, number_of_spins))
     return matrix

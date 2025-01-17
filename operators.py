@@ -2,8 +2,18 @@ import numpy as np
 from intial_values import *
 
 
-# this function returns a list with all m_i for each ket
 def s_z(vec, spin, k, i):
+    """This function acts as the s_z operator on a given ket and simply returns.
+    the m_i which is quantum number of the i-th spin.
+    Note: m_i = a_i - spin, since a computational basis is used.
+    Example: s_z|0.5> = 0.5|0.5>,
+    solution of the eigenvalue equation for s_z|s, m> = m|s, m>
+
+    Args:
+    vec (list): List of basis vectors
+    spin (float): Spin of the system
+    k (int): Index of the basis vector
+    i (int): Index of the spin"""
     basis_vectors = vec.copy()
     vector = basis_vectors[k]
     m_i = vector[i] - spin
@@ -12,6 +22,14 @@ def s_z(vec, spin, k, i):
 
 # this function returns a list with all pre-factors that s_plus produces for each ket
 def s_plus(vec, spin, k, i):
+    """This function acts as the s_plus operator on a given ket and returns
+    the square root of some weird formula as seen in the code.
+
+    Args:
+        vec (list): List of basis vectors
+        spin (float): Spin of the system
+        k (int): Index of the basis vector
+        i (int): Index of the spin"""
     basis_vectors = vec.copy()
     vector = basis_vectors[k]
     m = vector[i] - spin

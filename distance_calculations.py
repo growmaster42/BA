@@ -2,8 +2,13 @@ import numpy as np
 from intial_values import x, y
 
 
-# takes x and y coordinates for the first spin to be on the ring and calculates its polar coordinates
+
 def cartesian_to_polar():
+    """This function takes the x and y coordinates of the first spin
+     on the ring and returns the polar coordinates of the spin.
+
+     Args:
+     None yet, but actually x and y are the coordinates of the first spin on the ring"""
     r = np.sqrt(x ** 2 + y ** 2)
     phi = np.arccos(x / r)
     start_position = [r, phi]
@@ -12,6 +17,11 @@ def cartesian_to_polar():
 
 # calculates positions for all spins in polar coordinates starting from an initial user-defined spin
 def position_polar(num_spins):
+    """This function takes the number of spins and returns a dictionary
+    with the polar coordinates of each spin on the ring.
+
+    Args:
+    num_spins (int): Number of spins on the ring"""
     start_position = cartesian_to_polar()
     start_angle = start_position[1]
     radius = start_position[0]
