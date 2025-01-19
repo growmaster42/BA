@@ -3,5 +3,7 @@ from expectation_values import *
 from saving_data import *
 from concurrent.futures import ProcessPoolExecutor
 import time
-from plotting import degeneracy_plot
+from plotting import *
+from make_table import *
+
 
