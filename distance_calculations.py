@@ -1,14 +1,15 @@
 import numpy as np
 from intial_values import x, y
 
-
-
 def cartesian_to_polar():
     """This function takes the x and y coordinates of the first spin
      on the ring and returns the polar coordinates of the spin.
 
      Args:
-     None yet, but actually x and y are the coordinates of the first spin on the ring"""
+     None yet, but actually x and y are the coordinates of the first spin on the
+     ring, the center of the ring is always at (0,0)
+     returns:
+     start_position (list): List with the polar coordinates of the spin"""
     r = np.sqrt(x ** 2 + y ** 2)
     phi = np.arccos(x / r)
     start_position = [r, phi]
@@ -21,7 +22,10 @@ def position_polar(num_spins):
     with the polar coordinates of each spin on the ring.
 
     Args:
-    num_spins (int): Number of spins on the ring"""
+    num_spins (int): Number of spins on the ring
+    returns:
+    positions (dict): Dictionary with the polar coordinates of each spin with key
+    being the index of the spin"""
     start_position = cartesian_to_polar()
     start_angle = start_position[1]
     radius = start_position[0]
@@ -36,6 +40,12 @@ def position_polar(num_spins):
 # calculates all the positions of spins by using a start-spin whose position can be defined by user, also using
 # np.arrays for the first time here
 def all_positions_cartesian(num_spins):
+    """calculates all the positions of spins by using a start-spin
+    whose position can be defined by user
+    Args:
+        num_spins (int): Number of spins on the ring
+    Returns:
+        all_positions (dict): Dictionary with the cartesian coordinates of each spin"""
     all_positions_polar = position_polar(num_spins)
     all_positions = {}
     for i in range(num_spins):
@@ -48,6 +58,9 @@ def all_positions_cartesian(num_spins):
 
 # function that creates all the connection vectors for each possible spin pair, returns list with vectors
 def connection_vectors(num_spins):
+    """This function creates all the connection vectors for each possible spin pair
+    Args:
+        num_spins (int): Number of spins on the ring"""
     all_positions = all_positions_cartesian(num_spins)
     all_connection_vectors = {}
     for i in range(num_spins - 1):
@@ -57,9 +70,14 @@ def connection_vectors(num_spins):
     return all_connection_vectors
 
 
-# function that calculates all distances between each spin using the connection vectors, returns list with r_ij
 def r_ij(num_spins):
+    """This function calculates all distances between each spin using the connection vectors
+    Args:
+        num_spins (int): Number of spins on the ring
+    Returns:
+        all_r_ij (dict): Dictionary with the distances between each spin"""
     all_connection_vectors = connection_vectors(num_spins)
+    # initialize dictionary
     all_r_ij = {}
     for name, vector in all_connection_vectors.items():
         r = np.linalg.norm(vector)
@@ -67,9 +85,13 @@ def r_ij(num_spins):
     return all_r_ij
 
 
-# this function returns all normalised connection vectors
+
 def unit_connection_vectors(num_spins):
-    all_connection_vectors = connection_vectors(num_spins)
+    """This function returns all normalised connection vectors
+    Args:
+        num_spins (int): Number of spins on the ring
+    Returns:
+        all_unit_connection_vectors (dict): Dictionary with the normalised connection vectors"""
     all_r_ij = r_ij(num_spins)
     all_unit_connection_vectors = {}
     for name, vector in connection_vectors(num_spins).items():  # enumerate returns a tuple that contains the index i (from 0
@@ -80,9 +102,12 @@ def unit_connection_vectors(num_spins):
     return all_unit_connection_vectors
 
 
-# function that creates all orientation matrices using the outer product, x, y are to define the initial position of
-# the first spin
 def orientation_matrices(num_spins):
+    """This function creates all orientation matrices using the outer product
+    Args:
+        num_spins (int): Number of spins on the ring
+    Returns:
+        all_matrices (dict): Dictionary with the orientation matrices"""
     all_unit_connection_vectors = unit_connection_vectors(num_spins)
     all_matrices = {}
     for name, vector in all_unit_connection_vectors.items():
@@ -93,6 +118,11 @@ def orientation_matrices(num_spins):
 
 # function that calculates b_ij pre-factors which are derived from r_ij
 def b_ij(num_spins):
+    """This function calculates all b_ij pre-factors which are derived from r_ij
+    Args:
+        num_spins (int): Number of spins on the ring
+    Returns:
+        all_b_ij (dict): Dictionary with the b_ij pre-factors"""
     all_r_ij = r_ij(num_spins)
     all_b_ij = {}
     for name, entry in all_r_ij.items():
