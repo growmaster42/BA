@@ -1,8 +1,9 @@
-import os
-from expectation_values import all_exp_values
 from pathlib import Path
-from saving_data import collect_degeneracies
+from saving_data import *
 import matplotlib.pyplot as plt
+from scipy.interpolate import make_interp_spline
+from matplotlib.lines import Line2D
+
 plt.rcParams['text.usetex'] = True
 
 
@@ -83,13 +84,6 @@ def plot_dict(data, spin, num_spins, dg_deg):
     print("Plot saved")
     #plt.show()
 
-
-def save_all_plots(spin, max_spins):
-    for num_spins in range(2, max_spins + 1):
-        dg_deg = 0
-        plot_dict(all_exp_values(spin, num_spins, dg_deg), spin, num_spins, dg_deg)
-
-
 def create_connected_dots(num_dots, figsize=(8, 8)):
     """
     Creates a visualization with dots distributed on a circle and connected by dashed lines.
@@ -138,10 +132,6 @@ def create_connected_dots(num_dots, figsize=(8, 8)):
     plt.savefig(f"data/rings/spin_ring_with_{num_dots}.pdf", format="pdf")
     plt.show()
 
-
-import matplotlib.pyplot as plt
-import numpy as np
-
 def plot_vectors():
     fig, ax = plt.subplots(figsize=(10, 6))
 
@@ -186,23 +176,6 @@ def plot_vectors():
 
 # Call the function to create and save the plot
 
-import numpy as np
-import matplotlib.pyplot as plt
-
-import matplotlib.pyplot as plt
-import numpy as np
-
-import matplotlib.pyplot as plt
-import numpy as np
-
-
-import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
-
-import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
-
-import matplotlib.pyplot as plt
 
 def generate_coupling_graph(coupling_type):
     """
@@ -246,8 +219,152 @@ def generate_coupling_graph(coupling_type):
     plt.close()
     print(f"PDF saved as {filename}")
 
-# Example usage
-# generate_coupling_graph("ferro")
-# generate_coupling_graph("antiferro")
 
+
+def plot_sys_expect_values(spin, min_spin, max_spin):
+    """
+    Plots three dictionaries with keys as x-values and values as y-values.
+    Each dictionary gets a different color, and the points are connected by dashed splines.
+    The plot is saved as a PDF in the 'data/plots' directory.
+    """
+    # Ensure the directory exists
+    directory = "data/plots"
+    os.makedirs(directory, exist_ok=True)  # Create the folder if it doesn't exist
+    dict_1 = load_json('data/expectation_values_spin_rings',
+                       f'spin={spin}_j_ij=-1_spins_min={min_spin}_spins_max={max_spin}.json')
+    dict_2 = load_json('data/expectation_values_spin_rings',
+                       f'spin={spin}_j_ij=0_spins_min={min_spin}_spins_max={max_spin}.json')
+    dict_3 = load_json('data/expectation_values_spin_rings',
+                       f'spin={spin}_j_ij=1_spins_min={min_spin}_spins_max={max_spin}.json')
+    j_ij = [-1, 0, 1]
+    # Construct the full file path
+    file_path = os.path.join(directory, f"expectation_values_spin={spin}.pdf")
+
+    # Assign unique colors for each dictionary
+    colors = ['red', 'blue', 'green']
+    dicts = [dict_1, dict_2, dict_3]
+
+    # Create a figure and axis
+    plt.figure(figsize=(8, 6))
+    #create empty list for custom legend handles
+    custom_legend_handles = []
+    # Loop through each dictionary and plot
+    for idx, data in enumerate(dicts):
+        # Sort the keys for consistent plotting
+        x = np.array(sorted(data.keys()))
+        y = np.array([data[key] for key in x])
+
+        # Create a spline for smooth curves
+        x_new = np.linspace(x.min(), x.max(), 300)
+        if len(dict_1) >= 4:
+            spline = make_interp_spline(x, y, k=3) # Cubic spline
+        else:
+            spline = make_interp_spline(x, y, k=2)
+        y_smooth = spline(x_new)
+
+        # Plot with dashed lines and scatter points
+        plt.plot(x_new, y_smooth, color=colors[idx], linestyle='--')
+        plt.scatter(x, y, color=colors[idx])
+        #add custom legend handles
+        custom_legend_handles.append(
+        Line2D([0], [0], color=colors[idx], linestyle='--', marker='o', markersize=5, label=r'$J_{ij}=$' + f'{j_ij[idx]}'))
+    # Adjust axis and labels
+    plt.xlabel(r'Number of Spins')
+    plt.ylabel(r'$\langle \hat{S}_i \cdot \hat{S}_{i+1} \rangle$')
+    if spin == 0.5:
+        spin_number = r'$\frac{1}{2}$'
+    elif spin == 1:
+        spin_number = '$1$'
+    elif spin == 1.5:
+        spin_number = r'$\frac{3}{2}$'
+    else:
+        print("Invalid spin value")
+    plt.title(r'Correlation Function for Spin Rings with $s=$' + spin_number)
+    # Add a legend with custom handles
+    plt.legend(handles=custom_legend_handles)
+    plt.grid(True)
+    plt.tight_layout()
+
+    # Save the plot as PDF and show it
+    plt.savefig(file_path, dpi=300, bbox_inches='tight', format='pdf', transparent=True)
+    plt.show()
+
+
+
+
+
+
+def plot_sys_exp_pairs(spin, num_spins, show_dict1=True, show_dict2=True, show_dict3=True):
+    """
+    Plot system experimental pairs with options to show/hide different dictionaries.
+
+    Parameters:
+    -----------
+    spin : float
+        Spin value for the plot title and filename
+    num_spins : int
+        Number of spins for the plot title and filename
+    show_dict1 : bool, optional (default=True)
+        Whether to show dictionary 1 (j_{ij}=-1)
+    show_dict2 : bool, optional (default=True)
+        Whether to show dictionary 2 (j_{ij}=0)
+    show_dict3 : bool, optional (default=True)
+        Whether to show dictionary 3 (j_{ij}=0)
+    """
+    # Initialize empty dictionaries
+    dict_1 = load_tuple_exp(
+        f"data/expectation_values_spin_rings_all_pairs/spin={spin}_j_ij=-1_spins_max={num_spins}.json")
+    dict_2 = load_tuple_exp(
+        f"data/expectation_values_spin_rings_all_pairs/spin={spin}_j_ij=0_spins_max={num_spins}.json")
+    dict_3 = load_tuple_exp(
+        f"data/expectation_values_spin_rings_all_pairs/spin={spin}_j_ij=1_spins_max={num_spins}.json")
+
+    # Create 'data/plots' directory if it doesn't exist
+    os.makedirs('data/plots', exist_ok=True)
+
+    # Create figure and axis
+    plt.figure(figsize=(10, 6))
+
+    # Plot each dictionary with different colors and dashed lines if show_dict is True
+    if show_dict1:
+        plt.plot([str(k) for k in dict_1.keys()], list(dict_1.values()),
+                 'ro--', label=r"$j_{ij}=-1$", markersize=8)
+
+    if show_dict2:
+        plt.plot([str(k) for k in dict_2.keys()], list(dict_2.values()),
+                 'bo--', label=r"$j_{ij}=0$", markersize=8)
+
+    if show_dict3:
+        plt.plot([str(k) for k in dict_3.keys()], list(dict_3.values()),
+                 'go--', label=r"$j_{ij}=1$", markersize=8)
+
+    # Customize the plot
+    plt.xlabel(r'Spin Pairs $(i,j)$')
+    plt.ylabel('Correlation Value')
+    if spin == 0.5:
+        spin_number = r'$ s= \frac{1}{2}$'
+    elif spin == 1:
+        spin_number = r'$s = 1$'
+    plt.title(f'Correlators for spin pairs with'+ str(spin_number))
+    plt.legend()
+
+    # Add grid
+    plt.grid(True, linestyle='--', alpha=0.7)
+
+    # Rotate x-axis labels for better readability
+    plt.xticks(rotation=45)
+
+    # Adjust layout to prevent label cutoff
+    plt.tight_layout()
+
+    # Save the plot
+    plt.savefig(f'data/plots/correlators_all_pairs_spin={spin}_num_spins={num_spins}.pdf')
+
+    # Display the plot
+    #plt.show()
+if __name__ == "__main__":
+    dict1 = {1: 2, 2: 3, 3: 5, 4: 7}
+    dict2 = {1: 1, 2: 4, 3: 6, 5: 8}
+    dict3 = {2: 2, 4: 3, 6: 7, 8: 10}
+    plot_sys_expect_values(dict1, dict2, dict3)
 

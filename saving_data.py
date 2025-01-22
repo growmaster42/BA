@@ -1,10 +1,11 @@
 import multiprocessing as mp
-from numpy import linalg as lg
-from interaction_models import *
-from numpy import isclose
+import numpy as np
+from interaction_models import spin_ring
 import pickle
 import os
-
+import json
+from expectation_values import expectation_value_s_i_s_i_plus_one
+import ast
 def spin_system_to_dict(spin, num_spins, j_ij):
     """This function takes the spin, the number of spins and the interaction model and returns a dictionary with the
     eigenvalues, eigenvectors and degeneracies of the system. The key of the dictionary is a tuple of the function name,
@@ -128,5 +129,103 @@ def collect_degeneracies(spin, j_ij, state):
     return all_degeneracies
 
 
+def make_exp_dict(spin, j_ij, spins_min, spins_max):
+    exp_dict = {}
+    for num_spins in range(spins_min, spins_max + 1):
+        spin_pair=(0, 1)
+        eigenvector =load_system(spin, num_spins, j_ij)['eigenvectors'][:, 0]
+        exp_value = np.real(expectation_value_s_i_s_i_plus_one(spin, num_spins, eigenvector, spin_pair))
+        exp_dict[num_spins] = exp_value
+    return exp_dict
 
 
+def expec_value_all_pairs_to_dict(spin, number_of_spins, j_ij):
+    """Calculate the expectation values of all pairs of spins in a ring and return them as a dictionary."""
+    # Pre-load eigenvectors to avoid recomputation in the loop
+    eigenvector = load_system(spin, number_of_spins, j_ij)['eigenvectors'][:, 0]
+
+    # Create the dictionary with converted keys inline
+    exp_value_dict = {
+        str((i, (i + 1) % number_of_spins)):
+            np.real(
+                expectation_value_s_i_s_i_plus_one(spin, number_of_spins, eigenvector, (i, (i + 1) % number_of_spins)))
+        for i in range(number_of_spins)
+    }
+
+    return exp_value_dict
+
+
+def save_spin_rings_single_expect(data, spin, j_ij, spins_min , spins_max):
+    # Ensure the directory exists
+    directory = 'data/expectation_values_spin_rings'
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    # Define the file path
+    file_path = os.path.join(directory,
+        f'spin={spin}_j_ij={j_ij}_spins_min={spins_min}_spins_max={spins_max}.json')
+
+    # Write the dictionary to a JSON file
+    with open(file_path, 'w') as json_file:
+        json.dump(data, json_file, indent=4)
+
+    print(f"Dictionary successfully saved to {file_path}")
+
+def save_spin_rings_all_pairs_exp(data, spin, j_ij, spins_max):
+    """Save the expectation values of all pairs of spins in a ring to a JSON file.
+    Args:
+        data (dict): Dictionary containing the expectation values of all pairs of spins,
+                     function expectation_values_all_pairs can be used here
+        spin (float): Spin of the system
+        j_ij (float): Coupling constant
+        spins_max (int): Maximum number of spins in the ring
+        Returns:
+                None """
+    # Ensure the directory exists
+    directory = 'data/expectation_values_spin_rings_all_pairs'
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    # Define the file path
+    file_path = os.path.join(directory,
+        f'spin={spin}_j_ij={j_ij}_spins_max={spins_max}.json')
+
+    # Write the dictionary to a JSON file
+    with open(file_path, 'w') as json_file:
+        json.dump(data, json_file, indent=4)
+
+    print(f"Dictionary successfully saved to {file_path}")
+
+
+def load_json(path, name):
+    # Construct the full file path
+    file_path = os.path.join(path, name)
+
+    # Open the file and load the JSON data
+    with open(file_path, 'r') as file:
+        data = json.load(file)
+
+    return {float(k) if '.' in k else int(k): v for k, v in data.items()}
+
+
+def convert_keys_to_tuple(data):
+    """Convert string keys to tuples in a nested dictionary or list.
+    Args:
+        data (dict or list): Dictionary or list containing string keys
+    Returns:
+        dict or list: Dictionary or list with string keys converted to tuples"""
+    if isinstance(data, dict):
+        return {ast.literal_eval(k): convert_keys_to_tuple(v) for k, v in data.items()}
+    elif isinstance(data, list):
+        return [convert_keys_to_tuple(item) for item in data]
+    else:
+        return data
+
+
+def load_tuple_exp(file_path):
+    with open(file_path, 'r') as json_file:
+        data = json.load(json_file)
+
+    # Convert string keys back to tuples
+    data_with_tuples = {ast.literal_eval(k): v for k, v in data.items()}
+
+    return data_with_tuples

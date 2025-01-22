@@ -17,6 +17,20 @@ def expectation_value_sz_sz(spin, number_of_spins, eigenvector, spin_pair):
 
     return np.dot(eigenvector.conj(), psi)
 
+def expectation_value_sz(spin, number_of_spins, eigenvector, i):
+    num_spins = number_of_spins
+
+    basis_vectors = basvec(spin, number_of_spins)
+    psi = np.zeros(len(eigenvector), dtype=complex)
+    for k, eig_v in enumerate(eigenvector):
+        vec_num = vector_number(basis_vectors[k], spin)
+        # sz_sz
+        sz = s_z(basis_vectors, spin, k, i)
+        psi[vec_num] += sz * eigenvector[vec_num]
+
+
+    return np.dot(eigenvector.conj(), psi)
+
 
 def expectation_value_s_plus_s_minus(spin, number_of_spins, eigenvector, spin_pair):
     num_spins = number_of_spins
