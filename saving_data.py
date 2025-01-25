@@ -139,10 +139,10 @@ def make_exp_dict(spin, j_ij, spins_min, spins_max):
     return exp_dict
 
 
-def expec_value_all_pairs_to_dict(spin, number_of_spins, j_ij):
+def expec_value_all_pairs_to_dict(spin, number_of_spins, j_ij, state):
     """Calculate the expectation values of all pairs of spins in a ring and return them as a dictionary."""
     # Pre-load eigenvectors to avoid recomputation in the loop
-    eigenvector = load_system(spin, number_of_spins, j_ij)['eigenvectors'][:, 0]
+    eigenvector = load_system(spin, number_of_spins, j_ij)['eigenvectors'][:, state]
 
     # Create the dictionary with converted keys inline
     exp_value_dict = {
@@ -171,7 +171,7 @@ def save_spin_rings_single_expect(data, spin, j_ij, spins_min , spins_max):
 
     print(f"Dictionary successfully saved to {file_path}")
 
-def save_spin_rings_all_pairs_exp(data, spin, j_ij, spins_max):
+def save_spin_rings_all_pairs_exp(data, spin, j_ij, spins_max, directory='data/expectation_values_spin_rings_all_pairs'):
     """Save the expectation values of all pairs of spins in a ring to a JSON file.
     Args:
         data (dict): Dictionary containing the expectation values of all pairs of spins,
@@ -182,7 +182,6 @@ def save_spin_rings_all_pairs_exp(data, spin, j_ij, spins_max):
         Returns:
                 None """
     # Ensure the directory exists
-    directory = 'data/expectation_values_spin_rings_all_pairs'
     if not os.path.exists(directory):
         os.makedirs(directory)
     # Define the file path
@@ -229,3 +228,69 @@ def load_tuple_exp(file_path):
     data_with_tuples = {ast.literal_eval(k): v for k, v in data.items()}
 
     return data_with_tuples
+
+
+def create_latex_table(s, num, decimals=6):
+    #print(f"Starting function with s={s}, num={num}, decimals={decimals}")  # Debug print
+
+    # Dictionary to store data for different j_ij values
+    data_dict = {}
+
+    # Iterate over j_ij values
+    for j_ij in range(-1, 2):
+        filename = f"data/expectation_values_spin_rings_all_pairs/spin={s}_j_ij={j_ij}_spins_max={num}.json"
+        #print(f"Attempting to open file: {filename}")  # Debug print
+
+        try:
+            with open(filename, 'r') as f:
+                data = json.load(f)
+                # Convert string representation of tuples back to actual tuples and round the values
+                data = {eval(k): round(v, decimals) for k, v in data.items()}
+                data_dict[j_ij] = data
+                #print(f"Successfully loaded data for j_ij={j_ij}")  # Debug print
+        except FileNotFoundError:
+            print(f"Warning: File {filename} not found!")
+            return
+
+    # Get all unique pairs (keys) from all dictionaries
+    all_pairs = set()
+    for j_data in data_dict.values():
+        all_pairs.update(j_data.keys())
+    all_pairs = sorted(all_pairs)
+
+    #print(f"Found {len(all_pairs)} unique pairs")  # Debug print
+
+    latex_output = [
+        "\\begin{table}[h]",
+        "\\centering",
+        "\\begin{tabular}{|c|c|c|c|}",
+        "\\hline",
+        "Pair & $J_{ij}=-1$ & $J_{ij}=0$ & $J_{ij}=1$ \\\\",
+        "\\hline"
+    ]
+
+    for pair in all_pairs:
+        row = [
+            f"({pair[0]},{pair[1]})",
+            f"{data_dict[-1].get(pair, '-'):.{decimals}f}",
+            f"{data_dict[0].get(pair, '-'):.{decimals}f}",
+            f"{data_dict[1].get(pair, '-'):.{decimals}f}"
+        ]
+        latex_output.append(" & ".join(row) + " \\\\")
+        latex_output.append("\\hline")
+
+    latex_output.extend([
+        "\\end{tabular}",
+        f"\\caption{{Spin ring with s={s} and \\#spins = {num}}}",
+        "\\end{table}"
+    ])
+
+    #print("\nGenerated LaTeX table:")  # Debug print
+    for line in latex_output:
+        print(line)
+
+
+# Now actually call the function with some parameters:
+if __name__ == "__main__":
+    print("Starting program")
+    create_latex_table(s=0.5, num=4, decimals=3)

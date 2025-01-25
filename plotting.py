@@ -3,6 +3,7 @@ from saving_data import *
 import matplotlib.pyplot as plt
 from scipy.interpolate import make_interp_spline
 from matplotlib.lines import Line2D
+from scipy.optimize import curve_fit
 
 plt.rcParams['text.usetex'] = True
 
@@ -50,10 +51,6 @@ def degeneracy_plot(spin, j_ij, state):
     plt.savefig(f"data/plots/degeneracy_for_s={spin}_and_j_ij={j_ij}_in_state={state}.pdf", format="pdf")
     # Show the plot
     #plt.show()
-
-
-import matplotlib.pyplot as plt
-import numpy as np
 
 
 def plot_dict(data, spin, num_spins, dg_deg):
@@ -290,10 +287,6 @@ def plot_sys_expect_values(spin, min_spin, max_spin):
     plt.show()
 
 
-
-
-
-
 def plot_sys_exp_pairs(spin, num_spins, show_dict1=True, show_dict2=True, show_dict3=True):
     """
     Plot system experimental pairs with options to show/hide different dictionaries.
@@ -362,9 +355,171 @@ def plot_sys_exp_pairs(spin, num_spins, show_dict1=True, show_dict2=True, show_d
 
     # Display the plot
     #plt.show()
-if __name__ == "__main__":
-    dict1 = {1: 2, 2: 3, 3: 5, 4: 7}
-    dict2 = {1: 1, 2: 4, 3: 6, 5: 8}
-    dict3 = {2: 2, 4: 3, 6: 7, 8: 10}
-    plot_sys_expect_values(dict1, dict2, dict3)
+
+
+def plot_eigenstate_evolution_half(save_path='data/plots',
+                              timestamp='2025-01-24 16:00:27',
+                              user='growmaster42'):
+    # Create directory if it doesn't exist
+    os.makedirs(save_path, exist_ok=True)
+
+    # Define the exponential function for fitting
+    def exp_func(x, a, b, c):
+        return a * np.exp(b * x) + c
+
+    # Data
+    data = {
+        r'$J_{ij} = -1$': {
+            'x': np.array([3, 4, 5, 6, 7, 8, 9, 10]),
+            'y': np.array([-1.6117863820993121, -4.032461143809934, -4.033541112369547, -6.569731929672131,
+                           -12.118103416763434, -21.640729558870905, -35.837003990575, -55.92696708714688])
+        },
+        r'$J_{ij} = 0$': {
+            'x': np.array([3, 4, 5, 6, 7, 8, 9, 10]),
+            'y': np.array([-0.4685528, -1.5254977, -3.6906414, -7.6981213,
+                           -14.3146174, -24.4865779, -39.2991429, -59.9840949])
+        },
+        r'$J_{ij} = 1$': {
+            'x': np.array([3, 4, 5, 6, 7, 8, 9, 10]),
+            'y': np.array([-1.8596573, -3.0596840, -4.6940646, -9.3198199,
+                           -16.5563872, -27.3516828, -42.7705081, -64.0460788])
+        }
+    }
+
+    # Colors for each dataset
+    colors = ['blue', 'green', 'red']
+
+    # Create the plot
+    plt.figure(figsize=(10, 6))
+
+    # Print fitting coefficients
+    print("Fitting coefficients (a, b, c) for y = a * exp(b * x) + c:")
+    print("-" * 50)
+
+    # First plot all fitted curves
+    for (label, dataset), color in zip(data.items(), colors):
+        x = dataset['x']
+        y = dataset['y']
+
+        # Fit the exponential function
+        popt, _ = curve_fit(exp_func, x, y)
+
+        # Print coefficients
+        print(f"{label}:")
+        print(f"a = {popt[0]:.8f}")
+        print(f"b = {popt[1]:.8f}")
+        print(f"c = {popt[2]:.8f}")
+        print("-" * 50)
+
+        # Generate smooth curve for the fit
+        x_fit = np.linspace(min(x), max(x), 200)
+        y_fit = exp_func(x_fit, *popt)
+
+        # Plot the fitted curve (dashed line)
+        plt.plot(x_fit, y_fit, '--', color=color, label=r'Fitting: ' + label)
+
+    # Then plot all data points
+    for (label, dataset), color in zip(data.items(), colors):
+        x = dataset['x']
+        y = dataset['y']
+        # Plot the original data points
+        plt.plot(x, y, 'o', color=color, markerfacecolor=color,
+                markersize=8, markeredgecolor='white', markeredgewidth=1, label=label)
+
+    # Customize the plot
+    plt.xlabel('Number of Spins', fontsize=18)
+    plt.ylabel(r'Eigenvalues', fontsize=18)
+    plt.title(r'Eigenstate Evolution $s = \frac{1}{2}$', fontsize=18)
+    plt.legend(loc='best')
+    plt.grid(True, linestyle='--', alpha=0.7)
+
+
+    plt.savefig(os.path.join(save_path, 'eigenstate_evolution_s=0.5.pdf'),
+                bbox_inches='tight')
+
+    # Show the plot
+    plt.show()
+
+# Call the function
+def plot_eigenstate_evolution_one(save_path='data/plots',
+                              timestamp='2025-01-24 16:00:27',
+                              user='growmaster42'):
+    # Create directory if it doesn't exist
+    os.makedirs(save_path, exist_ok=True)
+
+    # Define the exponential function for fitting
+    def exp_func(x, a, b, c):
+        return a * np.exp(b * x) + c
+
+    # Data
+    data = {
+        r'$J_{ij} = -1$': {
+            'x': np.array([3, 4, 5, 6, 7]),
+            'y': np.array([-6.275025852521177,-12.611985280603264,-14.402318738965866,-25.5146930659471,
+                           -48.4529810455124])
+        },
+        r'$J_{ij} = 0$': {
+            'x': np.array([3, 4, 5, 6, 7]),
+            'y': np.array([-1.8430620905058719,-5.952907421739498,-14.711049150806287,-30.733810600289107,
+                           -57.205131899154885])
+        },
+        r'$J_{ij} = 1$': {
+            'x': np.array([3, 4, 5, 6, 7]),
+            'y': np.array([-7.1952301231976685,-11.046189449961695,-18.178957879591092,-36.89708294135723,-66.0228013819197])
+        }
+    }
+
+    # Colors for each dataset
+    colors = ['blue', 'green', 'red']
+
+    # Create the plot
+    plt.figure(figsize=(10, 6))
+
+    # Print fitting coefficients
+    print("Fitting coefficients (a, b, c) for y = a * exp(b * x) + c:")
+    print("-" * 50)
+
+    # First plot all fitted curves
+    for (label, dataset), color in zip(data.items(), colors):
+        x = dataset['x']
+        y = dataset['y']
+
+        # Fit the exponential function
+        popt, _ = curve_fit(exp_func, x, y)
+
+        # Print coefficients
+        print(f"{label}:")
+        print(f"a = {popt[0]:.8f}")
+        print(f"b = {popt[1]:.8f}")
+        print(f"c = {popt[2]:.8f}")
+        print("-" * 50)
+
+        # Generate smooth curve for the fit
+        x_fit = np.linspace(min(x), max(x), 200)
+        y_fit = exp_func(x_fit, *popt)
+
+        # Plot the fitted curve (dashed line)
+        plt.plot(x_fit, y_fit, '--', color=color, label=r'Fitting: ' + label)
+
+    # Then plot all data points
+    for (label, dataset), color in zip(data.items(), colors):
+        x = dataset['x']
+        y = dataset['y']
+        # Plot the original data points
+        plt.plot(x, y, 'o', color=color, markerfacecolor=color,
+                markersize=8, markeredgecolor='white', markeredgewidth=1, label=label)
+
+    # Customize the plot
+    plt.xlabel('Number of Spins', fontsize=18)
+    plt.ylabel(r'Eigenvalues', fontsize=18)
+    plt.title(r'Eigenstate Evolution $s = 1$', fontsize=18)
+    plt.legend(loc='best')
+    plt.grid(True, linestyle='--', alpha=0.7)
+
+
+    plt.savefig(os.path.join(save_path, 'eigenstate_evolution_s=1.pdf'),
+                bbox_inches='tight')
+
+    # Show the plot
+    plt.show()
 
