@@ -81,6 +81,12 @@ def plot_dict(data, spin, num_spins, dg_deg):
     print("Plot saved")
     #plt.show()
 
+
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+from matplotlib.lines import Line2D
+
 def create_connected_dots(num_dots, figsize=(8, 8)):
     """
     Creates a visualization with dots distributed on a circle and connected by dashed lines.
@@ -90,7 +96,7 @@ def create_connected_dots(num_dots, figsize=(8, 8)):
     figsize (tuple): Size of the figure (width, height)
     """
     # Create a new figure with specified size
-    plt.figure(figsize=figsize)
+    fig, ax = plt.subplots(figsize=figsize)
 
     # Create a circle
     circle = plt.Circle((0, 0), 1, fill=False, color='black')
@@ -101,33 +107,53 @@ def create_connected_dots(num_dots, figsize=(8, 8)):
     y_coords = np.sin(angles)
 
     # Add the circle to the plot
-    ax = plt.gca()
     ax.add_patch(circle)
 
     # Plot dots
-    plt.scatter(x_coords, y_coords, color='blue', s=100, zorder=2)
+    ax.scatter(x_coords, y_coords, color='blue', s=100, zorder=2, label='spin')
 
     # Connect all dots with dashed red lines
     for i in range(num_dots):
         for j in range(i + 1, num_dots):
-            plt.plot([x_coords[i], x_coords[j]],
-                     [y_coords[i], y_coords[j]],
-                     'r--',
-                     alpha=0.5,
-                     zorder=1)
+            ax.plot([x_coords[i], x_coords[j]],
+                    [y_coords[i], y_coords[j]],
+                    'r--',
+                    alpha=0.5,
+                    zorder=1,
+                    label='dipole dipole interaction' if (i == 0 and j == 1) else "")
 
     # Set equal aspect ratio and limits
-    plt.axis('equal')
-    plt.xlim(-1.2, 1.2)
-    plt.ylim(-1.2, 1.2)
+    ax.set_aspect('equal')
+    ax.set_xlim(-1.1, 1.1)
+    ax.set_ylim(-1.1, 1.1)
 
     # Remove axes
-    plt.axis('off')
-    # make os.makedirs to create the directory if it doesn't exist
+    ax.axis('off')
 
+    # Create custom legend handles
+    legend_handles = [
+        Line2D([0], [0], color='blue', marker='o', linestyle='None', markersize=10, label='spin'),
+        Line2D([0], [0], color='red', linestyle='--', label='dipole dipole interaction'),
+        Line2D([0], [0], color='black', linestyle='-', label='ring')
+    ]
+
+    # Add legend below the circle, aligned to the left
+    ax.legend(handles=legend_handles, loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=1, fontsize=20, frameon=False)
+
+    # Adjust layout to reduce white space
+    plt.subplots_adjust(left=0.05, right=0.95, top=0.95, bottom=0.15)
+
+    # Make directories if they don't exist
     os.makedirs('data/rings', exist_ok=True)
-    plt.savefig(f"data/rings/spin_ring_with_{num_dots}.pdf", format="pdf")
+
+    # Save the plot
+    plt.savefig(f"data/rings/spin_ring_with_{num_dots}.pdf", format="pdf", bbox_inches='tight')
     plt.show()
+
+# Example usage
+
+
+
 
 def plot_vectors():
     fig, ax = plt.subplots(figsize=(10, 6))

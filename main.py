@@ -19,9 +19,5 @@ def show_table():
             data[str(num_spins)] = eigenvalue
         print(data)
 
-#show_table()
-#dict1 = load_tuple_exp('data/expectation_values_spin_rings_all_pairs_second/spin=0.5_j_ij=-1_spins_max=3.json')
-#plot_sys_exp_pairs(0.5, 3, dict1, -1)
-for num in range(3, 8):
-    create_latex_table(
-        1, num, decimals=4)
+create_connected_dots(9, (8,8))
+
