@@ -269,6 +269,7 @@ def plot_sys_expect_values(spin, min_spin, max_spin):
 
     # Create a figure and axis
     plt.figure(figsize=(8, 6))
+    fig, ax = plt.subplots(figsize=(10, 6))
     #create empty list for custom legend handles
     custom_legend_handles = []
     # Loop through each dictionary and plot
@@ -290,10 +291,11 @@ def plot_sys_expect_values(spin, min_spin, max_spin):
         plt.scatter(x, y, color=colors[idx])
         #add custom legend handles
         custom_legend_handles.append(
-        Line2D([0], [0], color=colors[idx], linestyle='--', marker='o', markersize=5, label=r'$J_{ij}=$' + f'{j_ij[idx]}'))
+        Line2D([0], [0], color=colors[idx], linestyle='--', marker='o', markersize=5, label=r'$J_{ij}=$' + f'{j_ij[idx]} K'))
     # Adjust axis and labels
-    plt.xlabel(r'Number of Spins')
-    plt.ylabel(r'$\langle \hat{S}_i \cdot \hat{S}_{i+1} \rangle$')
+    ax.set_xlabel(r'Number of Spins', fontsize=22)
+    ax.set_ylabel(r'$\langle \hat{S}_i \cdot \hat{S}_{i+1} \rangle$', fontsize=22)
+
     if spin == 0.5:
         spin_number = r'$\frac{1}{2}$'
     elif spin == 1:
@@ -302,9 +304,19 @@ def plot_sys_expect_values(spin, min_spin, max_spin):
         spin_number = r'$\frac{3}{2}$'
     else:
         print("Invalid spin value")
-    plt.title(r'Correlation Function for Spin Rings with $s=$' + spin_number)
+    ax.set_title(r'Correlation Function for Spin Rings with $s=$' + spin_number, fontsize=22)
+
+    # Set legend font size
+    ax.legend(handles=custom_legend_handles, fontsize=16)
+
+    # Customize tick labels (axis values) font size
+    ax.tick_params(axis='both', labelsize=16)
+
+
+    # Add grid
+    ax.grid(True, linestyle='--', alpha=0.7)
     # Add a legend with custom handles
-    plt.legend(handles=custom_legend_handles)
+
     plt.grid(True)
     plt.tight_layout()
 
@@ -343,35 +355,40 @@ def plot_sys_exp_pairs(spin, num_spins, show_dict1=True, show_dict2=True, show_d
 
     # Create figure and axis
     plt.figure(figsize=(10, 6))
-
+    fig, ax = plt.subplots(figsize=(10, 6))
     # Plot each dictionary with different colors and dashed lines if show_dict is True
     if show_dict1:
         plt.plot([str(k) for k in dict_1.keys()], list(dict_1.values()),
-                 'ro--', label=r"$j_{ij}=-1$", markersize=8)
+                 'ro--', label=r"$J_{ij}=-1$ K", markersize=8)
 
     if show_dict2:
         plt.plot([str(k) for k in dict_2.keys()], list(dict_2.values()),
-                 'bo--', label=r"$j_{ij}=0$", markersize=8)
+                 'bo--', label=r"$J_{ij}=0$ K", markersize=8)
 
     if show_dict3:
         plt.plot([str(k) for k in dict_3.keys()], list(dict_3.values()),
-                 'go--', label=r"$j_{ij}=1$", markersize=8)
+                 'go--', label=r"$J_{ij}=1$ K", markersize=8)
 
     # Customize the plot
-    plt.xlabel(r'Spin Pairs $(i,j)$')
-    plt.ylabel('Correlation Value')
+    ax.set_xlabel(r'Spin Pairs $(i,j)$', fontsize=22)
+    ax.set_ylabel(r'Correlation Value', fontsize=22)
     if spin == 0.5:
         spin_number = r'$ s= \frac{1}{2}$'
     elif spin == 1:
         spin_number = r'$s = 1$'
-    plt.title(f'Correlators for spin pairs with'+ str(spin_number))
-    plt.legend()
+    ax.set_title(f'Correlators for spin pairs with ' + str(spin_number), fontsize=22)
+
+    # Set legend font size
+    ax.legend(fontsize=16)
+
+    # Customize tick labels (axis values) font size
+    ax.tick_params(axis='both', labelsize=16)
+
+    # Rotate x-axis labels
+    plt.xticks(rotation=45)
 
     # Add grid
-    plt.grid(True, linestyle='--', alpha=0.7)
-
-    # Rotate x-axis labels for better readability
-    plt.xticks(rotation=45)
+    ax.grid(True, linestyle='--', alpha=0.7)
 
     # Adjust layout to prevent label cutoff
     plt.tight_layout()

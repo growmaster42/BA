@@ -19,15 +19,5 @@ def show_table():
             data[str(num_spins)] = eigenvalue
         print(data)
 
-
-#eigenvector = load_system(0.5, 3, j_ij=-1)['eigenvectors'][0]
-#exp_val = quantum_number_i(0.5, 3, eigenvector)
-#print("exp val function", exp_val)
-
-#print(compute_sz_expectation(eigenvector))
-
-matrix = heis_all_pairs(basvec(0.5, 5), 0.5, 5, -1)
-eigenvalues, eigenvectors = np.linalg.eigh(matrix)
-print("eigenvalues \n", eigenvalues)
-
+plot_sys_expect_values(0.5, 3, 10)
 
