@@ -291,7 +291,8 @@ def plot_sys_expect_values(spin, min_spin, max_spin):
         plt.scatter(x, y, color=colors[idx])
         #add custom legend handles
         custom_legend_handles.append(
-        Line2D([0], [0], color=colors[idx], linestyle='--', marker='o', markersize=5, label=r'$J_{ij}=$' + f'{j_ij[idx]} K'))
+        Line2D([0], [0], color=colors[idx], linestyle='--', marker='o', markersize=5, label=r'$J_{ij}=$' +
+                                                                                            f'{j_ij[idx]} K'))
     # Adjust axis and labels
     ax.set_xlabel(r'Number of Spins', fontsize=22)
     ax.set_ylabel(r'$\langle \hat{S}_i \cdot \hat{S}_{i+1} \rangle$', fontsize=22)
@@ -304,13 +305,13 @@ def plot_sys_expect_values(spin, min_spin, max_spin):
         spin_number = r'$\frac{3}{2}$'
     else:
         print("Invalid spin value")
-    ax.set_title(r'Correlation Function for Spin Rings with $s=$' + spin_number, fontsize=22)
+    ax.set_title(r'Correlation Function for Spin Rings with $s=$' + spin_number, fontsize=30)
 
     # Set legend font size
-    ax.legend(handles=custom_legend_handles, fontsize=16)
+    ax.legend(handles=custom_legend_handles, fontsize=30)
 
     # Customize tick labels (axis values) font size
-    ax.tick_params(axis='both', labelsize=16)
+    ax.tick_params(axis='both', labelsize=30)
 
 
     # Add grid
@@ -370,19 +371,19 @@ def plot_sys_exp_pairs(spin, num_spins, show_dict1=True, show_dict2=True, show_d
                  'go--', label=r"$J_{ij}=1$ K", markersize=8)
 
     # Customize the plot
-    ax.set_xlabel(r'Spin Pairs $(i,j)$', fontsize=22)
-    ax.set_ylabel(r'Correlation Value', fontsize=22)
+    ax.set_xlabel(r'Spin Pairs $(i,j)$', fontsize=30)
+    ax.set_ylabel(r'Correlation Value', fontsize=30)
     if spin == 0.5:
         spin_number = r'$ s= \frac{1}{2}$'
     elif spin == 1:
         spin_number = r'$s = 1$'
-    ax.set_title(f'Correlators for spin pairs with ' + str(spin_number), fontsize=22)
+    ax.set_title(f'Correlators for spin pairs with ' + str(spin_number), fontsize=30)
 
     # Set legend font size
     ax.legend(fontsize=16)
 
     # Customize tick labels (axis values) font size
-    ax.tick_params(axis='both', labelsize=16)
+    ax.tick_params(axis='both', labelsize=18)
 
     # Rotate x-axis labels
     plt.xticks(rotation=45)
@@ -412,17 +413,17 @@ def plot_eigenstate_evolution_half(save_path='data/plots',
 
     # Data
     data = {
-        r'$J_{ij} = -1$': {
+        r'$J_{ij} = -1$ K': {
             'x': np.array([3, 4, 5, 6, 7, 8, 9, 10]),
             'y': np.array([-1.6117863820993121, -4.032461143809934, -4.033541112369547, -6.569731929672131,
                            -12.118103416763434, -21.640729558870905, -35.837003990575, -55.92696708714688])
         },
-        r'$J_{ij} = 0$': {
+        r'$J_{ij} = 0$ K': {
             'x': np.array([3, 4, 5, 6, 7, 8, 9, 10]),
             'y': np.array([-0.4685528, -1.5254977, -3.6906414, -7.6981213,
                            -14.3146174, -24.4865779, -39.2991429, -59.9840949])
         },
-        r'$J_{ij} = 1$': {
+        r'$J_{ij} = 1$ K': {
             'x': np.array([3, 4, 5, 6, 7, 8, 9, 10]),
             'y': np.array([-1.8596573, -3.0596840, -4.6940646, -9.3198199,
                            -16.5563872, -27.3516828, -42.7705081, -64.0460788])
@@ -470,10 +471,10 @@ def plot_eigenstate_evolution_half(save_path='data/plots',
                 markersize=8, markeredgecolor='white', markeredgewidth=1, label=label)
 
     # Customize the plot
-    plt.xlabel('Number of Spins', fontsize=18)
-    plt.ylabel(r'Eigenvalues', fontsize=18)
-    plt.title(r'Eigenstate Evolution $s = \frac{1}{2}$', fontsize=18)
-    plt.legend(loc='best')
+    plt.xlabel('Number of Spins', fontsize=22)
+    plt.ylabel(r'Eigenvalues', fontsize=22)
+    plt.title(r'Eigenstate Evolution $s = \frac{1}{2}$', fontsize=30)
+    plt.legend(loc='best', fontsize=18)
     plt.grid(True, linestyle='--', alpha=0.7)
 
 
@@ -496,17 +497,17 @@ def plot_eigenstate_evolution_one(save_path='data/plots',
 
     # Data
     data = {
-        r'$J_{ij} = -1$': {
+        r'$J_{ij} = -1$ K': {
             'x': np.array([3, 4, 5, 6, 7]),
             'y': np.array([-6.275025852521177,-12.611985280603264,-14.402318738965866,-25.5146930659471,
                            -48.4529810455124])
         },
-        r'$J_{ij} = 0$': {
+        r'$J_{ij} = 0$ K': {
             'x': np.array([3, 4, 5, 6, 7]),
             'y': np.array([-1.8430620905058719,-5.952907421739498,-14.711049150806287,-30.733810600289107,
                            -57.205131899154885])
         },
-        r'$J_{ij} = 1$': {
+        r'$J_{ij} = 1$ K': {
             'x': np.array([3, 4, 5, 6, 7]),
             'y': np.array([-7.1952301231976685,-11.046189449961695,-18.178957879591092,-36.89708294135723,-66.0228013819197])
         }
@@ -553,10 +554,10 @@ def plot_eigenstate_evolution_one(save_path='data/plots',
                 markersize=8, markeredgecolor='white', markeredgewidth=1, label=label)
 
     # Customize the plot
-    plt.xlabel('Number of Spins', fontsize=18)
-    plt.ylabel(r'Eigenvalues', fontsize=18)
-    plt.title(r'Eigenstate Evolution $s = 1$', fontsize=18)
-    plt.legend(loc='best')
+    plt.xlabel('Number of Spins', fontsize=24)
+    plt.ylabel(r'Eigenvalues', fontsize=24)
+    plt.title(r'Eigenstate Evolution $s = 1$', fontsize=30)
+    plt.legend(loc='best', fontsize=18)
     plt.grid(True, linestyle='--', alpha=0.7)
 
 

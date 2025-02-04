@@ -19,5 +19,5 @@ def show_table():
             data[str(num_spins)] = eigenvalue
         print(data)
 
-plot_sys_expect_values(0.5, 3, 10)
-
+plot_eigenstate_evolution_half()
+plot_eigenstate_evolution_one()
