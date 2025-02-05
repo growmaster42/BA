@@ -399,9 +399,477 @@ def plot_sys_exp_pairs(spin, num_spins, show_dict1=True, show_dict2=True, show_d
 
     # Display the plot
     #plt.show()
+def plot_eigenstate_evolution_one_linear(save_path='data/plots',
+                                      timestamp='2025-01-24 16:00:27',
+                                      user='growmaster42'):
+    # Create directory if it doesn't exist
+    os.makedirs(save_path, exist_ok=True)
+
+    # Define the linear function for fitting
+    def linear_func(x, m, b):
+        return m * x + b
+
+    # Add R-squared calculation function
+    def r_squared(y_true, y_pred):
+        ss_res = np.sum((y_true - y_pred) ** 2)
+        ss_tot = np.sum((y_true - np.mean(y_true)) ** 2)
+        return 1 - (ss_res / ss_tot)
+
+    # Data
+    data = {
+        r'$J_{ij} = -1$ K': {
+            'x': np.array([3, 4, 5, 6, 7]),
+            'y': np.array([-6.275025852521177, -12.611985280603264, -14.402318738965866, -25.5146930659471,
+                           -48.4529810455124])
+        },
+        r'$J_{ij} = 0$ K': {
+            'x': np.array([3, 4, 5, 6, 7]),
+            'y': np.array([-1.8430620905058719, -5.952907421739498, -14.711049150806287, -30.733810600289107,
+                           -57.205131899154885])
+        },
+        r'$J_{ij} = 1$ K': {
+            'x': np.array([3, 4, 5, 6, 7]),
+            'y': np.array(
+                [-7.1952301231976685, -11.046189449961695, -18.178957879591092, -36.89708294135723, -66.0228013819197])
+        }
+    }
+
+    # Colors for each dataset
+    colors = ['blue', 'green', 'red']
+
+    # Create the plot
+    plt.figure(figsize=(10, 6))
+
+    # Print fitting coefficients
+    print("Fitting coefficients (m, b) for y = mx + b:")
+    print("-" * 50)
+
+    # First plot all fitted curves
+    for (label, dataset), color in zip(data.items(), colors):
+        x = dataset['x']
+        y = dataset['y']
+
+        # Fit the linear function
+        popt, _ = curve_fit(linear_func, x, y)
+
+        # Calculate R-squared
+        y_pred = linear_func(x, *popt)
+        r2 = r_squared(y, y_pred)
+
+        # Print coefficients and R-squared
+        print(f"{label}:")
+        print(f"m = {popt[0]:.8f}")
+        print(f"b = {popt[1]:.8f}")
+        print(f"R² = {r2:.8f}")
+        print("-" * 50)
+
+        # Generate smooth curve for the fit
+        x_fit = np.linspace(min(x), max(x), 200)
+        y_fit = linear_func(x_fit, *popt)
+
+        # Plot the fitted curve (dashed line)
+        plt.plot(x_fit, y_fit, '--', color=color, label=r'Fitting: ' + label)
+
+    # Then plot all data points
+    for (label, dataset), color in zip(data.items(), colors):
+        x = dataset['x']
+        y = dataset['y']
+        # Plot the original data points
+        plt.plot(x, y, 'o', color=color, markerfacecolor=color,
+                 markersize=8, markeredgecolor='white', markeredgewidth=1, label=label)
+
+    # Customize the plot
+    plt.xlabel('Number of Spins', fontsize=24)
+    plt.ylabel(r'Eigenvalues', fontsize=24)
+    plt.title(r'Eigenstate Evolution $s = 1$', fontsize=30)
+    plt.legend(loc='best', fontsize=18)
+    plt.grid(True, linestyle='--', alpha=0.7)
+    plt.xticks(fontsize=20)
+    plt.yticks(fontsize=20)
+    plt.savefig(os.path.join(save_path, 'eigenstate_evolution_s=1_linear.pdf'),
+                bbox_inches='tight')
+
+    # Show the plot
+    plt.show()
+
+def plot_eigenstate_evolution_one_quad(save_path='data/plots',
+                                      timestamp='2025-01-24 16:00:27',
+                                      user='growmaster42'):
+    # Create directory if it doesn't exist
+    os.makedirs(save_path, exist_ok=True)
+
+    # Define the quadratic function for fitting
+    def quad_func(x, a, b, c):
+        return a * x ** 2 + b * x + c
+
+    # Add R-squared calculation function
+    def r_squared(y_true, y_pred):
+        ss_res = np.sum((y_true - y_pred) ** 2)
+        ss_tot = np.sum((y_true - np.mean(y_true)) ** 2)
+        return 1 - (ss_res / ss_tot)
+
+    # Data
+    data = {
+        r'$J_{ij} = -1$ K': {
+            'x': np.array([3, 4, 5, 6, 7]),
+            'y': np.array([-6.275025852521177, -12.611985280603264, -14.402318738965866, -25.5146930659471,
+                           -48.4529810455124])
+        },
+        r'$J_{ij} = 0$ K': {
+            'x': np.array([3, 4, 5, 6, 7]),
+            'y': np.array([-1.8430620905058719, -5.952907421739498, -14.711049150806287, -30.733810600289107,
+                           -57.205131899154885])
+        },
+        r'$J_{ij} = 1$ K': {
+            'x': np.array([3, 4, 5, 6, 7]),
+            'y': np.array(
+                [-7.1952301231976685, -11.046189449961695, -18.178957879591092, -36.89708294135723, -66.0228013819197])
+        }
+    }
+
+    # Colors for each dataset
+    colors = ['blue', 'green', 'red']
+
+    # Create the plot
+    plt.figure(figsize=(10, 6))
+
+    # Print fitting coefficients
+    print("Fitting coefficients (a, b, c) for y = ax² + bx + c:")
+    print("-" * 50)
+
+    # First plot all fitted curves
+    for (label, dataset), color in zip(data.items(), colors):
+        x = dataset['x']
+        y = dataset['y']
+
+        # Fit the quadratic function
+        popt, _ = curve_fit(quad_func, x, y)
+
+        # Calculate R-squared
+        y_pred = quad_func(x, *popt)
+        r2 = r_squared(y, y_pred)
+
+        # Print coefficients and R-squared
+        print(f"{label}:")
+        print(f"a = {popt[0]:.8f}")
+        print(f"b = {popt[1]:.8f}")
+        print(f"c = {popt[2]:.8f}")
+        print(f"R² = {r2:.8f}")
+        print("-" * 50)
+
+        # Generate smooth curve for the fit
+        x_fit = np.linspace(min(x), max(x), 200)
+        y_fit = quad_func(x_fit, *popt)
+
+        # Plot the fitted curve (dashed line)
+        plt.plot(x_fit, y_fit, '--', color=color, label=r'Fitting: ' + label)
+
+    # Then plot all data points
+    for (label, dataset), color in zip(data.items(), colors):
+        x = dataset['x']
+        y = dataset['y']
+        # Plot the original data points
+        plt.plot(x, y, 'o', color=color, markerfacecolor=color,
+                 markersize=8, markeredgecolor='white', markeredgewidth=1, label=label)
+
+    # Customize the plot
+    plt.xlabel('Number of Spins', fontsize=24)
+    plt.ylabel(r'Eigenvalues', fontsize=24)
+    plt.title(r'Eigenstate Evolution $s = 1$', fontsize=30)
+    plt.legend(loc='best', fontsize=18)
+    plt.grid(True, linestyle='--', alpha=0.7)
+    plt.xticks(fontsize=20)
+    plt.yticks(fontsize=20)
+    plt.savefig(os.path.join(save_path, 'eigenstate_evolution_s=1_quad.pdf'),
+                bbox_inches='tight')
+
+    # Show the plot
+    plt.show()
 
 
-def plot_eigenstate_evolution_half(save_path='data/plots',
+# Call the function
+def plot_eigenstate_evolution_one_exp(save_path='data/plots',
+                                      timestamp='2025-01-24 16:00:27',
+                                      user='growmaster42'):
+    # Create directory if it doesn't exist
+    os.makedirs(save_path, exist_ok=True)
+
+    # Define the exponential function for fitting
+    def exp_func(x, a, b, c):
+        return a * np.exp(b * x) + c
+
+    # Add R-squared calculation function
+    def r_squared(y_true, y_pred):
+        ss_res = np.sum((y_true - y_pred) ** 2)
+        ss_tot = np.sum((y_true - np.mean(y_true)) ** 2)
+        return 1 - (ss_res / ss_tot)
+
+    # Data
+    data = {
+        r'$J_{ij} = -1$ K': {
+            'x': np.array([3, 4, 5, 6, 7]),
+            'y': np.array([-6.275025852521177, -12.611985280603264, -14.402318738965866, -25.5146930659471,
+                           -48.4529810455124])
+        },
+        r'$J_{ij} = 0$ K': {
+            'x': np.array([3, 4, 5, 6, 7]),
+            'y': np.array([-1.8430620905058719, -5.952907421739498, -14.711049150806287, -30.733810600289107,
+                           -57.205131899154885])
+        },
+        r'$J_{ij} = 1$ K': {
+            'x': np.array([3, 4, 5, 6, 7]),
+            'y': np.array(
+                [-7.1952301231976685, -11.046189449961695, -18.178957879591092, -36.89708294135723, -66.0228013819197])
+        }
+    }
+
+    # Colors for each dataset
+    colors = ['blue', 'green', 'red']
+
+    # Create the plot
+    plt.figure(figsize=(10, 6))
+
+    # Print fitting coefficients
+    print("Fitting coefficients (a, b, c) for y = a * exp(b * x) + c:")
+    print("-" * 50)
+
+    # First plot all fitted curves
+    for (label, dataset), color in zip(data.items(), colors):
+        x = dataset['x']
+        y = dataset['y']
+
+        # Fit the exponential function
+        popt, _ = curve_fit(exp_func, x, y)
+
+        # Calculate R-squared
+        y_pred = exp_func(x, *popt)
+        r2 = r_squared(y, y_pred)
+
+        # Print coefficients and R-squared
+        print(f"{label}:")
+        print(f"a = {popt[0]:.8f}")
+        print(f"b = {popt[1]:.8f}")
+        print(f"c = {popt[2]:.8f}")
+        print(f"R² = {r2:.8f}")
+        print("-" * 50)
+
+        # Generate smooth curve for the fit
+        x_fit = np.linspace(min(x), max(x), 200)
+        y_fit = exp_func(x_fit, *popt)
+
+        # Plot the fitted curve (dashed line)
+        plt.plot(x_fit, y_fit, '--', color=color, label=r'Fitting: ' + label)
+
+    # Then plot all data points
+    for (label, dataset), color in zip(data.items(), colors):
+        x = dataset['x']
+        y = dataset['y']
+        # Plot the original data points
+        plt.plot(x, y, 'o', color=color, markerfacecolor=color,
+                 markersize=8, markeredgecolor='white', markeredgewidth=1, label=label)
+
+    # Customize the plot
+    plt.xlabel('Number of Spins', fontsize=24)
+    plt.ylabel(r'Eigenvalues', fontsize=24)
+    plt.title(r'Eigenstate Evolution $s = 1$', fontsize=30)
+    plt.legend(loc='best', fontsize=18)
+    plt.grid(True, linestyle='--', alpha=0.7)
+    plt.xticks(fontsize=20)
+    plt.yticks(fontsize=20)
+    plt.savefig(os.path.join(save_path, 'eigenstate_evolution_s=1_exp.pdf'),
+                bbox_inches='tight')
+
+    # Show the plot
+    plt.show()
+
+def plot_eigenstate_evolution_half_linear(save_path='data/plots',
+                                   timestamp='2025-02-05 12:04:13',
+                                   user='growmaster42'):
+    # Create directory if it doesn't exist
+    os.makedirs(save_path, exist_ok=True)
+
+    # Define the linear function for fitting
+    def linear_func(x, m, b):
+        return m * x + b
+
+    # Function to calculate R-squared
+    def r_squared(y_true, y_pred):
+        ss_res = np.sum((y_true - y_pred) ** 2)
+        ss_tot = np.sum((y_true - np.mean(y_true)) ** 2)
+        return 1 - (ss_res / ss_tot)
+
+    # Data
+    data = {
+        r'$J_{ij} = -1$ K': {
+            'x': np.array([3, 4, 5, 6, 7, 8, 9, 10]),
+            'y': np.array([-1.6117863820993121, -4.032461143809934, -4.033541112369547, -6.569731929672131,
+                           -12.118103416763434, -21.640729558870905, -35.837003990575, -55.92696708714688])
+        },
+        r'$J_{ij} = 0$ K': {
+            'x': np.array([3, 4, 5, 6, 7, 8, 9, 10]),
+            'y': np.array([-0.4685528, -1.5254977, -3.6906414, -7.6981213,
+                           -14.3146174, -24.4865779, -39.2991429, -59.9840949])
+        },
+        r'$J_{ij} = 1$ K': {
+            'x': np.array([3, 4, 5, 6, 7, 8, 9, 10]),
+            'y': np.array([-1.8596573, -3.0596840, -4.6940646, -9.3198199,
+                           -16.5563872, -27.3516828, -42.7705081, -64.0460788])
+        }
+    }
+
+    # Colors for each dataset
+    colors = ['blue', 'green', 'red']
+
+    # Create the plot
+    plt.figure(figsize=(10, 6))
+
+    # Print fitting coefficients
+    print("Fitting coefficients (m, b) for y = mx + b:")
+    print("-" * 50)
+
+    # First plot all fitted curves
+    for (label, dataset), color in zip(data.items(), colors):
+        x = dataset['x']
+        y = dataset['y']
+
+        # Fit the linear function
+        popt, _ = curve_fit(linear_func, x, y)
+
+        # Calculate R-squared
+        y_pred = linear_func(x, *popt)
+        r2 = r_squared(y, y_pred)
+
+        # Print coefficients and R-squared
+        print(f"{label}:")
+        print(f"m (slope) = {popt[0]:.8f}")
+        print(f"b (intercept) = {popt[1]:.8f}")
+        print(f"R² = {r2:.8f}")
+        print("-" * 50)
+
+        # Generate smooth curve for the fit
+        x_fit = np.linspace(min(x), max(x), 200)
+        y_fit = linear_func(x_fit, *popt)
+
+        # Plot the fitted curve (dashed line)
+        plt.plot(x_fit, y_fit, '--', color=color, label=r'Linear fit: ' + label)
+
+    # Then plot all data points
+    for (label, dataset), color in zip(data.items(), colors):
+        x = dataset['x']
+        y = dataset['y']
+        # Plot the original data points
+        plt.plot(x, y, 'o', color=color, markerfacecolor=color,
+                 markersize=8, markeredgecolor='white', markeredgewidth=1, label=label)
+
+    # Customize the plot
+    plt.xlabel('Number of Spins', fontsize=22)
+    plt.ylabel(r'Eigenvalues', fontsize=22)
+    plt.title(r'Eigenstate Evolution $s = \frac{1}{2}$', fontsize=30)
+    plt.legend(loc='best', fontsize=18)
+    plt.grid(True, linestyle='--', alpha=0.7)
+    plt.xticks(fontsize=20)
+    plt.yticks(fontsize=20)
+    plt.savefig(os.path.join(save_path, 'eigenstate_evolution_s=0.5_linear.pdf'),
+                bbox_inches='tight')
+
+    # Show the plot
+    plt.show()
+
+def plot_eigenstate_evolution_half_quad(save_path='data/plots',
+                              timestamp='2025-01-24 16:00:27',
+                              user='growmaster42'):
+    # Create directory if it doesn't exist
+    os.makedirs(save_path, exist_ok=True)
+
+    # Define the quadratic function for fitting
+    def quad_func(x, a, b, c):
+        return a * x**2 + b * x + c
+
+    # Add R-squared calculation function
+    def r_squared(y_true, y_pred):
+        ss_res = np.sum((y_true - y_pred) ** 2)
+        ss_tot = np.sum((y_true - np.mean(y_true)) ** 2)
+        return 1 - (ss_res / ss_tot)
+
+    # Data
+    data = {
+        r'$J_{ij} = -1$ K': {
+            'x': np.array([3, 4, 5, 6, 7, 8, 9, 10]),
+            'y': np.array([-1.6117863820993121, -4.032461143809934, -4.033541112369547, -6.569731929672131,
+                           -12.118103416763434, -21.640729558870905, -35.837003990575, -55.92696708714688])
+        },
+        r'$J_{ij} = 0$ K': {
+            'x': np.array([3, 4, 5, 6, 7, 8, 9, 10]),
+            'y': np.array([-0.4685528, -1.5254977, -3.6906414, -7.6981213,
+                           -14.3146174, -24.4865779, -39.2991429, -59.9840949])
+        },
+        r'$J_{ij} = 1$ K': {
+            'x': np.array([3, 4, 5, 6, 7, 8, 9, 10]),
+            'y': np.array([-1.8596573, -3.0596840, -4.6940646, -9.3198199,
+                           -16.5563872, -27.3516828, -42.7705081, -64.0460788])
+        }
+    }
+
+    # Colors for each dataset
+    colors = ['blue', 'green', 'red']
+
+    # Create the plot
+    plt.figure(figsize=(10, 6))
+
+    # Print fitting coefficients
+    print("Fitting coefficients (a, b, c) for y = ax² + bx + c:")
+    print("-" * 50)
+
+    # First plot all fitted curves
+    for (label, dataset), color in zip(data.items(), colors):
+        x = dataset['x']
+        y = dataset['y']
+
+        # Fit the quadratic function
+        popt, _ = curve_fit(quad_func, x, y)
+
+        # Calculate R-squared
+        y_pred = quad_func(x, *popt)
+        r2 = r_squared(y, y_pred)
+
+        # Print coefficients and R-squared
+        print(f"{label}:")
+        print(f"a = {popt[0]:.8f}")
+        print(f"b = {popt[1]:.8f}")
+        print(f"c = {popt[2]:.8f}")
+        print(f"R² = {r2:.8f}")
+        print("-" * 50)
+
+        # Generate smooth curve for the fit
+        x_fit = np.linspace(min(x), max(x), 200)
+        y_fit = quad_func(x_fit, *popt)
+
+        # Plot the fitted curve (dashed line)
+        plt.plot(x_fit, y_fit, '--', color=color, label=r'Fitting: ' + label)
+
+    # Then plot all data points
+    for (label, dataset), color in zip(data.items(), colors):
+        x = dataset['x']
+        y = dataset['y']
+        # Plot the original data points
+        plt.plot(x, y, 'o', color=color, markerfacecolor=color,
+                markersize=8, markeredgecolor='white', markeredgewidth=1, label=label)
+
+    # Customize the plot
+    plt.xlabel('Number of Spins', fontsize=22)
+    plt.ylabel(r'Eigenvalues', fontsize=22)
+    plt.title(r'Eigenstate Evolution $s = \frac{1}{2}$', fontsize=30)
+    plt.legend(loc='best', fontsize=18)
+    plt.grid(True, linestyle='--', alpha=0.7)
+    plt.xticks(fontsize=20)
+    plt.yticks(fontsize=20)
+    plt.savefig(os.path.join(save_path, 'eigenstate_evolution_s=0.5_quad.pdf'),
+                bbox_inches='tight')
+
+    # Show the plot
+    plt.show()
+
+def plot_eigenstate_evolution_half_exp(save_path='data/plots',
                               timestamp='2025-01-24 16:00:27',
                               user='growmaster42'):
     # Create directory if it doesn't exist
@@ -410,6 +878,12 @@ def plot_eigenstate_evolution_half(save_path='data/plots',
     # Define the exponential function for fitting
     def exp_func(x, a, b, c):
         return a * np.exp(b * x) + c
+
+    # Add R-squared calculation function
+    def r_squared(y_true, y_pred):
+        ss_res = np.sum((y_true - y_pred) ** 2)
+        ss_tot = np.sum((y_true - np.mean(y_true)) ** 2)
+        return 1 - (ss_res / ss_tot)
 
     # Data
     data = {
@@ -448,11 +922,17 @@ def plot_eigenstate_evolution_half(save_path='data/plots',
         # Fit the exponential function
         popt, _ = curve_fit(exp_func, x, y)
 
+        # Calculate R-squared
+        y_pred = exp_func(x, *popt)
+        r2 = r_squared(y, y_pred)
+
         # Print coefficients
+        # Print coefficients and R-squared
         print(f"{label}:")
         print(f"a = {popt[0]:.8f}")
         print(f"b = {popt[1]:.8f}")
         print(f"c = {popt[2]:.8f}")
+        print(f"R² = {r2:.8f}")
         print("-" * 50)
 
         # Generate smooth curve for the fit
@@ -476,94 +956,10 @@ def plot_eigenstate_evolution_half(save_path='data/plots',
     plt.title(r'Eigenstate Evolution $s = \frac{1}{2}$', fontsize=30)
     plt.legend(loc='best', fontsize=18)
     plt.grid(True, linestyle='--', alpha=0.7)
-
-
-    plt.savefig(os.path.join(save_path, 'eigenstate_evolution_s=0.5.pdf'),
+    plt.xticks(fontsize=20)
+    plt.yticks(fontsize=20)
+    plt.savefig(os.path.join(save_path, 'eigenstate_evolution_s=0.5_exp.pdf'),
                 bbox_inches='tight')
 
     # Show the plot
     plt.show()
-
-# Call the function
-def plot_eigenstate_evolution_one(save_path='data/plots',
-                              timestamp='2025-01-24 16:00:27',
-                              user='growmaster42'):
-    # Create directory if it doesn't exist
-    os.makedirs(save_path, exist_ok=True)
-
-    # Define the exponential function for fitting
-    def exp_func(x, a, b, c):
-        return a * np.exp(b * x) + c
-
-    # Data
-    data = {
-        r'$J_{ij} = -1$ K': {
-            'x': np.array([3, 4, 5, 6, 7]),
-            'y': np.array([-6.275025852521177,-12.611985280603264,-14.402318738965866,-25.5146930659471,
-                           -48.4529810455124])
-        },
-        r'$J_{ij} = 0$ K': {
-            'x': np.array([3, 4, 5, 6, 7]),
-            'y': np.array([-1.8430620905058719,-5.952907421739498,-14.711049150806287,-30.733810600289107,
-                           -57.205131899154885])
-        },
-        r'$J_{ij} = 1$ K': {
-            'x': np.array([3, 4, 5, 6, 7]),
-            'y': np.array([-7.1952301231976685,-11.046189449961695,-18.178957879591092,-36.89708294135723,-66.0228013819197])
-        }
-    }
-
-    # Colors for each dataset
-    colors = ['blue', 'green', 'red']
-
-    # Create the plot
-    plt.figure(figsize=(10, 6))
-
-    # Print fitting coefficients
-    print("Fitting coefficients (a, b, c) for y = a * exp(b * x) + c:")
-    print("-" * 50)
-
-    # First plot all fitted curves
-    for (label, dataset), color in zip(data.items(), colors):
-        x = dataset['x']
-        y = dataset['y']
-
-        # Fit the exponential function
-        popt, _ = curve_fit(exp_func, x, y)
-
-        # Print coefficients
-        print(f"{label}:")
-        print(f"a = {popt[0]:.8f}")
-        print(f"b = {popt[1]:.8f}")
-        print(f"c = {popt[2]:.8f}")
-        print("-" * 50)
-
-        # Generate smooth curve for the fit
-        x_fit = np.linspace(min(x), max(x), 200)
-        y_fit = exp_func(x_fit, *popt)
-
-        # Plot the fitted curve (dashed line)
-        plt.plot(x_fit, y_fit, '--', color=color, label=r'Fitting: ' + label)
-
-    # Then plot all data points
-    for (label, dataset), color in zip(data.items(), colors):
-        x = dataset['x']
-        y = dataset['y']
-        # Plot the original data points
-        plt.plot(x, y, 'o', color=color, markerfacecolor=color,
-                markersize=8, markeredgecolor='white', markeredgewidth=1, label=label)
-
-    # Customize the plot
-    plt.xlabel('Number of Spins', fontsize=24)
-    plt.ylabel(r'Eigenvalues', fontsize=24)
-    plt.title(r'Eigenstate Evolution $s = 1$', fontsize=30)
-    plt.legend(loc='best', fontsize=18)
-    plt.grid(True, linestyle='--', alpha=0.7)
-
-
-    plt.savefig(os.path.join(save_path, 'eigenstate_evolution_s=1.pdf'),
-                bbox_inches='tight')
-
-    # Show the plot
-    plt.show()
-

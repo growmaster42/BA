@@ -18,6 +18,9 @@ def show_table():
             eigenvalue = load_system(1, num_spins, j_ij)['eigenvalues'][0]
             data[str(num_spins)] = eigenvalue
         print(data)
-
-plot_eigenstate_evolution_half()
-plot_eigenstate_evolution_one()
+plot_eigenstate_evolution_one_linear()
+#plot_eigenstate_evolution_one_exp()
+#plot_eigenstate_evolution_one_quad()
+#plot_eigenstate_evolution_half_linear()
+#plot_eigenstate_evolution_half_exp()
+#plot_eigenstate_evolution_half_quad()
