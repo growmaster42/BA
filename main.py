@@ -10,17 +10,5 @@ import time
 from plotting import *
 from make_table import *
 
-def show_table():
-    for j_ij in range(-1, 2):
-        print(f"J_ij = {j_ij}")
-        data = {}
-        for num_spins in range(3, 8):
-            eigenvalue = load_system(1, num_spins, j_ij)['eigenvalues'][0]
-            data[str(num_spins)] = eigenvalue
-        print(data)
-plot_eigenstate_evolution_one_linear()
-#plot_eigenstate_evolution_one_exp()
-#plot_eigenstate_evolution_one_quad()
-#plot_eigenstate_evolution_half_linear()
-#plot_eigenstate_evolution_half_exp()
-#plot_eigenstate_evolution_half_quad()
+#print(load_system(0.5, 2, -1))
+

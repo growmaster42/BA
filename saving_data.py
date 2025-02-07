@@ -289,6 +289,19 @@ def create_latex_table(s, num, decimals=6):
     for line in latex_output:
         print(line)
 
+def show_table():
+    """
+    This function is used to show the table of the expectation values of the spin ring.
+    returns:
+        None
+    """
+    for j_ij in range(-1, 2):
+        print(f"J_ij = {j_ij}")
+        data = {}
+        for num_spins in range(3, 8):
+            eigenvalue = load_system(1, num_spins, j_ij)['eigenvalues'][0]
+            data[str(num_spins)] = eigenvalue
+        print(data)
 
 # Now actually call the function with some parameters:
 if __name__ == "__main__":

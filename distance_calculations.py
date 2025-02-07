@@ -9,7 +9,8 @@ def cartesian_to_polar():
      None yet, but actually x and y are the coordinates of the first spin on the
      ring, the center of the ring is always at (0,0)
      returns:
-     start_position (list): List with the polar coordinates of the spin"""
+     start_position (list): List with the polar coordinates of the spin
+     :rtype: object"""
     r = np.sqrt(x ** 2 + y ** 2)
     phi = np.arccos(x / r)
     start_position = [r, phi]

@@ -82,14 +82,10 @@ def plot_dict(data, spin, num_spins, dg_deg):
     #plt.show()
 
 
-import matplotlib.pyplot as plt
-import numpy as np
-import os
-from matplotlib.lines import Line2D
-
 def create_connected_dots(num_dots, figsize=(8, 8)):
     """
     Creates a visualization with dots distributed on a circle and connected by dashed lines.
+    The dots are numbered starting from 0 at the northernmost point.
 
     Parameters:
     num_dots (int): Number of dots to distribute on the circle
@@ -109,8 +105,23 @@ def create_connected_dots(num_dots, figsize=(8, 8)):
     # Add the circle to the plot
     ax.add_patch(circle)
 
-    # Plot dots
+    # Plot dots and add numbers
     ax.scatter(x_coords, y_coords, color='blue', s=100, zorder=2, label='spin')
+
+    # Add numbers next to dots
+    for i in range(num_dots):
+        # Calculate text position slightly outside the dot
+        # Increase the radius by 0.15 to position the text outside the dot
+        text_x = 1.15 * x_coords[i]
+        text_y = 1.15 * y_coords[i]
+
+        # Special case for the northernmost dot (i=0)
+        if i == 0:
+            ax.text(text_x, text_y, f'({i},{num_dots})',
+                    ha='center', va='bottom', fontsize=22)
+        else:
+            ax.text(text_x, text_y, f'({i})',
+                    ha='center', va='center', fontsize=22)
 
     # Connect all dots with dashed red lines
     for i in range(num_dots):
@@ -124,8 +135,8 @@ def create_connected_dots(num_dots, figsize=(8, 8)):
 
     # Set equal aspect ratio and limits
     ax.set_aspect('equal')
-    ax.set_xlim(-1.1, 1.1)
-    ax.set_ylim(-1.1, 1.1)
+    ax.set_xlim(-1.3, 1.3)  # Increased limits to accommodate the numbers
+    ax.set_ylim(-1.3, 1.3)
 
     # Remove axes
     ax.axis('off')
@@ -138,7 +149,8 @@ def create_connected_dots(num_dots, figsize=(8, 8)):
     ]
 
     # Add legend below the circle, aligned to the left
-    ax.legend(handles=legend_handles, loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=1, fontsize=20, frameon=False)
+    ax.legend(handles=legend_handles, loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=1, fontsize=22,
+              frameon=True)
 
     # Adjust layout to reduce white space
     plt.subplots_adjust(left=0.05, right=0.95, top=0.95, bottom=0.15)
