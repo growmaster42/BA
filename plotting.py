@@ -255,6 +255,80 @@ def generate_coupling_graph(coupling_type):
     print(f"PDF saved as {filename}")
 
 
+def plot_sys_expect_values_dashed(spin, min_spin, max_spin):
+    """
+    Plots three dictionaries with keys as x-values and values as y-values.
+    Each dictionary gets a different color, and the points are connected by dashed lines.
+    The plot is saved as a PDF in the 'data/plots' directory.
+    """
+    # Ensure the directory exists
+    directory = "data/plots"
+    os.makedirs(directory, exist_ok=True)  # Create the folder if it doesn't exist
+    dict_1 = load_json('data/expectation_values_spin_rings',
+                       f'spin={spin}_j_ij=-1_spins_min={min_spin}_spins_max={max_spin}.json')
+    dict_2 = load_json('data/expectation_values_spin_rings',
+                       f'spin={spin}_j_ij=0_spins_min={min_spin}_spins_max={max_spin}.json')
+    dict_3 = load_json('data/expectation_values_spin_rings',
+                       f'spin={spin}_j_ij=1_spins_min={min_spin}_spins_max={max_spin}.json')
+    j_ij = [-1, 0, 1]
+    # Construct the full file path
+    file_path = os.path.join(directory, f"expectation_values_spin={spin}.pdf")
+
+    # Assign unique colors for each dictionary
+    colors = ['red', 'blue', 'green']
+    dicts = [dict_1, dict_2, dict_3]
+
+    # Create a figure and axis
+    plt.figure(figsize=(8, 6))
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    # create empty list for custom legend handles
+    custom_legend_handles = []
+
+    # Loop through each dictionary and plot
+    for idx, data in enumerate(dicts):
+        # Sort the keys for consistent plotting
+        x = np.array(sorted(data.keys()))
+        y = np.array([data[key] for key in x])
+
+        # Plot with dashed lines and scatter points
+        # No spline interpolation - just direct dashed lines between points
+        plt.plot(x, y, color=colors[idx], linestyle='--')
+        plt.scatter(x, y, color=colors[idx])
+
+        # add custom legend handles
+        custom_legend_handles.append(
+            Line2D([0], [0], color=colors[idx], linestyle='--', marker='o',
+                   markersize=5, label=r'$J_{ij}=$' + f'{j_ij[idx]} K'))
+
+    # Adjust axis and labels
+    ax.set_xlabel(r'Number of Spins', fontsize=22)
+    ax.set_ylabel(r'$\langle \hat{S}_i \cdot \hat{S}_{i+1} \rangle$', fontsize=22)
+
+    if spin == 0.5:
+        spin_number = r'$\frac{1}{2}$'
+    elif spin == 1:
+        spin_number = '$1$'
+    elif spin == 1.5:
+        spin_number = r'$\frac{3}{2}$'
+    else:
+        print("Invalid spin value")
+    ax.set_title(r'Correlation Function for Spin Rings with $s=$' + spin_number, fontsize=30)
+
+    # Set legend font size
+    ax.legend(handles=custom_legend_handles, fontsize=30)
+
+    # Customize tick labels (axis values) font size
+    ax.tick_params(axis='both', labelsize=30)
+
+    # Add grid
+    ax.grid(True, linestyle='--', alpha=0.7)
+
+    plt.tight_layout()
+
+    # Save the plot as PDF and show it
+    plt.savefig(file_path, dpi=300, bbox_inches='tight', format='pdf', transparent=True)
+    plt.show()
 
 def plot_sys_expect_values(spin, min_spin, max_spin):
     """
@@ -393,7 +467,7 @@ def plot_sys_exp_pairs(spin, num_spins, show_dict1=True, show_dict2=True, show_d
 
     # Set legend font size
     ax.legend(fontsize=16)
-
+    ax.legend(loc='center left', bbox_to_anchor=(0.7, 0.25), fontsize=16)
     # Customize tick labels (axis values) font size
     ax.tick_params(axis='both', labelsize=18)
 
@@ -492,8 +566,8 @@ def plot_eigenstate_evolution_one_linear(save_path='data/plots',
 
     # Customize the plot
     plt.xlabel('Number of Spins', fontsize=24)
-    plt.ylabel(r'Eigenvalues', fontsize=24)
-    plt.title(r'Eigenstate Evolution $s = 1$', fontsize=30)
+    plt.ylabel(r'Ground States', fontsize=24)
+    plt.title(r'Ground State Evolution $s = 1$', fontsize=30)
     plt.legend(loc='best', fontsize=18)
     plt.grid(True, linestyle='--', alpha=0.7)
     plt.xticks(fontsize=20)
@@ -586,8 +660,8 @@ def plot_eigenstate_evolution_one_quad(save_path='data/plots',
 
     # Customize the plot
     plt.xlabel('Number of Spins', fontsize=24)
-    plt.ylabel(r'Eigenvalues', fontsize=24)
-    plt.title(r'Eigenstate Evolution $s = 1$', fontsize=30)
+    plt.ylabel(r'Ground States', fontsize=24)
+    plt.title(r'Ground State Evolution $s = 1$', fontsize=30)
     plt.legend(loc='best', fontsize=18)
     plt.grid(True, linestyle='--', alpha=0.7)
     plt.xticks(fontsize=20)
@@ -682,8 +756,8 @@ def plot_eigenstate_evolution_one_exp(save_path='data/plots',
 
     # Customize the plot
     plt.xlabel('Number of Spins', fontsize=24)
-    plt.ylabel(r'Eigenvalues', fontsize=24)
-    plt.title(r'Eigenstate Evolution $s = 1$', fontsize=30)
+    plt.ylabel(r'Ground States', fontsize=24)
+    plt.title(r'Ground State Evolution $s = 1$', fontsize=30)
     plt.legend(loc='best', fontsize=18)
     plt.grid(True, linestyle='--', alpha=0.7)
     plt.xticks(fontsize=20)
@@ -775,8 +849,8 @@ def plot_eigenstate_evolution_half_linear(save_path='data/plots',
 
     # Customize the plot
     plt.xlabel('Number of Spins', fontsize=22)
-    plt.ylabel(r'Eigenvalues', fontsize=22)
-    plt.title(r'Eigenstate Evolution $s = \frac{1}{2}$', fontsize=30)
+    plt.ylabel(r'Ground States', fontsize=22)
+    plt.title(r'Ground State Evolution $s = \frac{1}{2}$', fontsize=30)
     plt.legend(loc='best', fontsize=18)
     plt.grid(True, linestyle='--', alpha=0.7)
     plt.xticks(fontsize=20)
@@ -869,8 +943,8 @@ def plot_eigenstate_evolution_half_quad(save_path='data/plots',
 
     # Customize the plot
     plt.xlabel('Number of Spins', fontsize=22)
-    plt.ylabel(r'Eigenvalues', fontsize=22)
-    plt.title(r'Eigenstate Evolution $s = \frac{1}{2}$', fontsize=30)
+    plt.ylabel(r'Ground States', fontsize=22)
+    plt.title(r'Ground State Evolution $s = \frac{1}{2}$', fontsize=30)
     plt.legend(loc='best', fontsize=18)
     plt.grid(True, linestyle='--', alpha=0.7)
     plt.xticks(fontsize=20)
@@ -964,8 +1038,8 @@ def plot_eigenstate_evolution_half_exp(save_path='data/plots',
 
     # Customize the plot
     plt.xlabel('Number of Spins', fontsize=22)
-    plt.ylabel(r'Eigenvalues', fontsize=22)
-    plt.title(r'Eigenstate Evolution $s = \frac{1}{2}$', fontsize=30)
+    plt.ylabel(r'Ground States', fontsize=22)
+    plt.title(r'Ground State Evolution $s = \frac{1}{2}$', fontsize=30)
     plt.legend(loc='best', fontsize=18)
     plt.grid(True, linestyle='--', alpha=0.7)
     plt.xticks(fontsize=20)

@@ -93,6 +93,7 @@ def expectation_value_s_i_s_i_plus_one(spin, number_of_spins, eigenvector, spin_
     exp_value = expectation_value_sz_sz(spin, number_of_spins, eigenvector, spin_pair) \
                 + 0.5 * expectation_value_s_minus_s_plus(spin, number_of_spins, eigenvector, spin_pair) \
                 + 0.5 * expectation_value_s_plus_s_minus(spin, number_of_spins, eigenvector, spin_pair)
+    print(f"({i, j}) done")
     return exp_value
 
 
